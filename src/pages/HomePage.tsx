@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { BottomPlayer } from "@/components/BottomPlayer";
-import { AuthModal } from "@/components/AuthModal";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ChevronRight, Heart } from "lucide-react";
+import { CoverFlow } from "@/components/CoverFlow";
+import { useI18n } from "@/hooks/useI18n";
 import { PlaylistAddModal } from "@/components/PlaylistAddModal";
-import { PlaylistViewModal } from "@/components/PlaylistViewModal";
-import { TopBar } from "@/components/TopBar";
 import { TrackRow } from "@/components/TrackRow";
-import { loadAllTracks } from "@/lib/loadTracks";
+import { fetchAllTracksFromSupabase } from "@/lib/loadTracks";
 import {
   addFavorite,
   addTrackToPlaylist,
@@ -13,7 +13,6 @@ import {
   fetchChartTracks,
   fetchFavoriteIds,
   fetchFavoriteTracks,
-  fetchPlaylistTracks,
   fetchPlaylists,
   removeFavorite,
   type PlaylistRow,
@@ -21,32 +20,27 @@ import {
 import { useAuthStore } from "@/store/useAuthStore";
 import type { PlayerTrack } from "@/store/usePlayerStore";
 import { usePlayerStore } from "@/store/usePlayerStore";
+import { useUIStore } from "@/store/useUIStore";
 
 export function HomePage() {
+  const { t } = useI18n();
+  const navigate = useNavigate();
   const playTrack = usePlayerStore((s) => s.playTrack);
   const user = useAuthStore((s) => s.user);
+  const setAuthOpen = useUIStore((s) => s.setAuthOpen);
+  const setHomeCatalog = useUIStore((s) => s.setHomeCatalog);
 
-  const [search, setSearch] = useState("");
-  const [authOpen, setAuthOpen] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
-
   const [chart, setChart] = useState<PlayerTrack[]>([]);
   const [catalog, setCatalog] = useState<PlayerTrack[]>([]);
   const [favorites, setFavorites] = useState<PlayerTrack[]>([]);
   const [favIds, setFavIds] = useState<Set<string>>(new Set());
   const [playlists, setPlaylists] = useState<PlaylistRow[]>([]);
 
-  const [playlistPickTrack, setPlaylistPickTrack] = useState<PlayerTrack | null>(
-    null
-  );
-  const [viewPlaylist, setViewPlaylist] = useState<{
-    name: string;
-    tracks: PlayerTrack[];
-  } | null>(null);
-
+  const [playlistPickTrack, setPlaylistPickTrack] =
+    useState<PlayerTrack | null>(null);
   const refreshCatalog = useCallback(async () => {
-    const { tracks } = await loadAllTracks();
-    setCatalog(tracks);
+    setCatalog(await fetchAllTracksFromSupabase());
   }, []);
 
   const refreshChart = useCallback(async () => {
@@ -71,11 +65,6 @@ export function HomePage() {
   }, [user]);
 
   useEffect(() => {
-    const unsub = useAuthStore.getState().init();
-    return unsub;
-  }, []);
-
-  useEffect(() => {
     void refreshCatalog();
     void refreshChart();
   }, [refreshCatalog, refreshChart]);
@@ -84,15 +73,12 @@ export function HomePage() {
     void refreshUserLibrary();
   }, [refreshUserLibrary]);
 
-  const filteredCatalog = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return catalog;
-    return catalog.filter(
-      (t) =>
-        t.title.toLowerCase().includes(q) ||
-        t.artist.toLowerCase().includes(q)
-    );
-  }, [catalog, search]);
+  useEffect(() => {
+    setHomeCatalog(catalog);
+  }, [catalog, setHomeCatalog]);
+
+  const previewForFlow = chart[0] ?? catalog[0] ?? null;
+  const favPreview = favorites.slice(0, 5);
 
   const showNotice = (msg: string) => {
     setNotice(msg);
@@ -120,7 +106,10 @@ export function HomePage() {
       const ok = await addFavorite(user.id, track.id);
       if (ok) {
         setFavIds((prev) => new Set(prev).add(track.id));
-        setFavorites((prev) => [track, ...prev.filter((t) => t.id !== track.id)]);
+        setFavorites((prev) => [
+          track,
+          ...prev.filter((t) => t.id !== track.id),
+        ]);
         showNotice("В избранном");
       }
     }
@@ -151,41 +140,28 @@ export function HomePage() {
     setPlaylistPickTrack(null);
   };
 
-  const openPlaylist = async (p: PlaylistRow) => {
-    const tracks = await fetchPlaylistTracks(p.id);
-    setViewPlaylist({ name: p.name, tracks });
-  };
-
   return (
-    <div className="min-h-screen pb-40 dark-linen-bg font-ios">
-      <TopBar
-        search={search}
-        onSearch={setSearch}
-        onOpenAuth={() => setAuthOpen(true)}
-      />
-
+    <div>
       {notice ? (
-        <div className="fixed bottom-28 left-1/2 z-[95] max-w-sm -translate-x-1/2 rounded-lg border border-neutral-500 bg-gradient-to-b from-[#ffffcc] to-[#f5e6a8] px-4 py-2 text-center text-[12px] font-bold text-neutral-900 shadow-lg">
+        <div className="fixed bottom-[calc(8.5rem+env(safe-area-inset-bottom,0px))] left-1/2 z-[95] max-w-[min(20rem,calc(100vw-1.5rem))] -translate-x-1/2 rounded-lg border border-neutral-500 bg-gradient-to-b from-[#ffffcc] to-[#f5e6a8] px-3 py-2 text-center text-[11px] font-bold text-neutral-900 shadow-lg sm:bottom-[calc(9rem+env(safe-area-inset-bottom,0px))] sm:text-[12px]">
           {notice}
         </div>
       ) : null}
 
-      <main className="mx-auto max-w-4xl space-y-5 px-3 py-4">
+      <main className="mx-auto max-w-4xl space-y-4 px-2 py-3 sm:space-y-5 sm:px-3 sm:py-4">
+        <CoverFlow previewTrack={previewForFlow} />
+
         {/* Чарт */}
-        <section className="overflow-hidden rounded-xl border border-neutral-400/90 shadow-lg">
+        <section className="overflow-hidden rounded-xl border border-neutral-400/90 shadow-lg dark:border-neutral-600">
           <div className="metallic-bg--compact px-3 py-2">
             <h2 className="text-center text-[13px] font-bold inset-text--on-metal">
-              Чарт · топ-30 по прослушиваниям
+              {t("home.chartTitle")}
             </h2>
           </div>
-          <div className="bg-white">
+          <div className="bg-white dark:bg-neutral-900">
             {chart.length === 0 ? (
-              <p className="p-4 text-center text-[12px] font-semibold text-neutral-600">
-                Чарт пуст. Добавьте треки в Supabase и включите миграцию{" "}
-                <code className="rounded bg-neutral-100 px-1 text-[10px]">
-                  002_listen_chart_favorites.sql
-                </code>
-                — тогда счётчик начнёт расти при каждом запуске трека (UUID).
+              <p className="p-4 text-center text-[12px] font-semibold text-neutral-600 dark:text-neutral-400">
+                {t("home.chartEmpty")}
               </p>
             ) : (
               chart.map((t, i) => (
@@ -205,90 +181,89 @@ export function HomePage() {
           </div>
         </section>
 
-        {/* Избранное */}
-        {user ? (
-          <section className="overflow-hidden rounded-xl border border-neutral-400/90 shadow-lg">
-            <div className="ios-list-header">Избранное</div>
-            <div className="bg-white">
-              {favorites.length === 0 ? (
-                <p className="p-4 text-center text-[12px] font-semibold text-neutral-600">
-                  Нажмите ♥ у трека из каталога или чарта.
-                </p>
-              ) : (
-                favorites.map((t) => (
-                  <TrackRow
-                    key={t.id}
-                    track={t}
-                    variant="compact"
-                    isFavorite
-                    canFavorite
-                    onPlay={() => void playTrack(t, favorites)}
-                    onToggleFavorite={() => void handleToggleFavorite(t)}
-                    onOpenPlaylistMenu={() => setPlaylistPickTrack(t)}
-                  />
-                ))
-              )}
+        {/* Избранное → коллекция (клик по панели, не по кнопкам строки) */}
+        <section
+          className="cursor-pointer overflow-hidden rounded-xl border border-neutral-400/90 shadow-lg transition hover:brightness-[1.02] focus-within:ring-2 focus-within:ring-[#2477d1] dark:border-neutral-600"
+          role="link"
+          tabIndex={0}
+          onClick={(e) => {
+            if ((e.target as HTMLElement).closest("button")) return;
+            void navigate("/collection");
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              if ((e.target as HTMLElement).closest("button")) return;
+              void navigate("/collection");
+            }
+          }}
+        >
+          <div className="flex items-center justify-between bg-gradient-to-b from-[#8fa8c4] to-[#3d5a80] px-3 py-2">
+            <div className="flex items-center gap-2">
+              <Heart
+                className="h-4 w-4 text-white drop-shadow"
+                fill="currentColor"
+              />
+              <h2 className="text-[13px] font-bold text-white drop-shadow-sm">
+                {t("home.favTitle")}
+              </h2>
             </div>
-          </section>
-        ) : null}
-
-        {/* Плейлисты */}
-        {user ? (
-          <section className="overflow-hidden rounded-xl border border-neutral-400/90 shadow-lg">
-            <div className="ios-list-header">Мои плейлисты</div>
-            <div className="polished-floor-bg px-3 py-3">
-              {playlists.length === 0 ? (
-                <p className="text-center text-[12px] font-semibold text-neutral-600">
-                  Создайте плейлист через кнопку «В плейлист» у любого трека.
-                </p>
-              ) : (
-                <div className="flex gap-3 overflow-x-auto pb-1 pt-1 [scrollbar-width:thin]">
-                  {playlists.map((p) => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      onClick={() => void openPlaylist(p)}
-                      className="shrink-0 w-36 rounded-xl border border-neutral-400 bg-gradient-to-b from-white via-[#f8f8f8] to-[#dcdcdc] p-3 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.15)] active:translate-y-px"
-                    >
-                      <p className="line-clamp-2 text-[12px] font-bold inset-text">
-                        {p.name}
-                      </p>
-                      <p className="mt-1 text-[10px] font-semibold text-neutral-600">
-                        {p.trackCount ?? 0} треков
-                      </p>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </section>
-        ) : null}
+            <span className="flex items-center gap-0.5 text-[11px] font-bold text-white/95">
+              {t("home.favGo")}
+              <ChevronRight className="h-4 w-4" />
+            </span>
+          </div>
+          <div className="bg-white dark:bg-neutral-900">
+            {!user ? (
+              <p className="p-4 text-center text-[12px] font-semibold text-neutral-600 dark:text-neutral-400">
+                {t("home.favGuest")}
+              </p>
+            ) : favorites.length === 0 ? (
+              <p className="p-4 text-center text-[12px] font-semibold text-neutral-600 dark:text-neutral-400">
+                {t("home.favEmpty")}
+              </p>
+            ) : (
+              favPreview.map((t) => (
+                <TrackRow
+                  key={t.id}
+                  track={t}
+                  variant="compact"
+                  isFavorite
+                  canFavorite
+                  onPlay={() => void playTrack(t, favorites)}
+                  onToggleFavorite={() => void handleToggleFavorite(t)}
+                  onOpenPlaylistMenu={() => setPlaylistPickTrack(t)}
+                />
+              ))
+            )}
+          </div>
+        </section>
 
         {/* Каталог */}
-        <section className="overflow-hidden rounded-xl border border-neutral-400/90 shadow-lg">
-          <div className="ios-list-header">
-            Каталог · Supabase + user-tracks.json + демо
-          </div>
-          <div className="bg-white">
-            {filteredCatalog.map((t) => (
-              <TrackRow
-                key={t.id}
-                track={t}
-                variant="compact"
-                isFavorite={favIds.has(t.id)}
-                canFavorite={Boolean(user)}
-                onPlay={() => void playTrack(t, filteredCatalog)}
-                onToggleFavorite={() => void handleToggleFavorite(t)}
-                onOpenPlaylistMenu={() => setPlaylistPickTrack(t)}
-              />
-            ))}
+        <section className="overflow-hidden rounded-xl border border-neutral-400/90 shadow-lg dark:border-neutral-600">
+          <div className="ios-list-header">{t("home.catalogTitle")}</div>
+          <div className="bg-white dark:bg-neutral-900">
+            {catalog.length === 0 ? (
+              <p className="p-4 text-center text-[12px] font-semibold text-neutral-600 dark:text-neutral-400">
+                {t("home.catalogEmpty")}
+              </p>
+            ) : (
+              catalog.map((t) => (
+                <TrackRow
+                  key={t.id}
+                  track={t}
+                  variant="compact"
+                  isFavorite={favIds.has(t.id)}
+                  canFavorite={Boolean(user)}
+                  onPlay={() => void playTrack(t, catalog)}
+                  onToggleFavorite={() => void handleToggleFavorite(t)}
+                  onOpenPlaylistMenu={() => setPlaylistPickTrack(t)}
+                />
+              ))
+            )}
           </div>
         </section>
       </main>
-
-      <BottomPlayer />
-
-      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
 
       <PlaylistAddModal
         open={playlistPickTrack != null}
@@ -299,17 +274,6 @@ export function HomePage() {
         onCreateAndAdd={(name) => void handleCreatePlaylistAndAdd(name)}
       />
 
-      <PlaylistViewModal
-        open={viewPlaylist != null}
-        name={viewPlaylist?.name ?? ""}
-        tracks={viewPlaylist?.tracks ?? []}
-        onClose={() => setViewPlaylist(null)}
-        onPlayTrack={(t) => {
-          const list = viewPlaylist?.tracks ?? [];
-          void playTrack(t, list);
-          setViewPlaylist(null);
-        }}
-      />
     </div>
   );
 }

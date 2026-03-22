@@ -35,7 +35,7 @@ export function TrackRow({
 
   return (
     <div
-      className={`flex items-center gap-2 border-b border-[#e0e0e0] bg-white px-2 py-2 last:border-b-0 ${
+      className={`flex items-center gap-2 border-b border-[#e0e0e0] bg-white px-2 py-2 last:border-b-0 dark:border-neutral-700 dark:bg-neutral-900 ${
         variant === "chart" ? "min-h-[52px]" : ""
       }`}
     >

@@ -1,9 +1,0 @@
-[
-  {
-    "id": "local-1",
-    "title": "Мой трек",
-    "artist": "Моё имя",
-    "audioUrl": "https://ВАШ-ПРОЕКТ.supabase.co/storage/v1/object/public/audio_files/песня.mp3",
-    "coverUrl": "https://ВАШ-ПРОЕКТ.supabase.co/storage/v1/object/public/cover_art/обложка.jpg"
-  }
-]

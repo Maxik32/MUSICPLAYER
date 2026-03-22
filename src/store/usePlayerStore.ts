@@ -1,5 +1,9 @@
 import { create } from "zustand";
-import { recordTrackPlay } from "@/lib/trackPlays";
+import { isUuidTrackId, recordTrackPlay } from "@/lib/trackPlays";
+
+/** Один засчитанный play_count за текущую загрузку трека (≥15 с воспроизведения). */
+let playCountGateTrackId: string | null = null;
+let playCountRecordedForLoad = false;
 
 export type PlayerTrack = {
   id: string;
@@ -34,6 +38,11 @@ type PlayerState = {
   playTrack: (track: PlayerTrack, queue?: PlayerTrack[]) => Promise<void>;
   setQueue: (tracks: PlayerTrack[], startIndex?: number) => void;
   clearPlaybackError: () => void;
+  shuffle: boolean;
+  toggleShuffle: () => void;
+  /** 0..1, mirrored on HTMLAudioElement.volume */
+  volume: number;
+  setVolume: (v: number) => void;
 };
 
 let audioEl: HTMLAudioElement | null = null;
@@ -51,6 +60,11 @@ function getAudio(): HTMLAudioElement | null {
       audioEl.referrerPolicy = "no-referrer";
     } catch {
       /* older engines */
+    }
+    try {
+      audioEl.volume = usePlayerStore.getState().volume;
+    } catch {
+      audioEl.volume = 1;
     }
   }
   return audioEl;
@@ -96,6 +110,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
     const a = getAudio();
     if (!a) return;
     listenersBound = true;
+    a.volume = Math.max(0, Math.min(1, get().volume));
 
     const syncTime = () => {
       const dur = a.duration;
@@ -109,6 +124,20 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
             ? Math.min(1, Math.max(0, a.currentTime / durationSec))
             : 0,
       });
+
+      const tr = get().currentTrack;
+      if (
+        !playCountRecordedForLoad &&
+        playCountGateTrackId &&
+        tr &&
+        tr.id === playCountGateTrackId &&
+        !a.paused &&
+        isUuidTrackId(tr.id) &&
+        a.currentTime >= 15
+      ) {
+        playCountRecordedForLoad = true;
+        void recordTrackPlay(tr.id);
+      }
     };
 
     a.addEventListener("timeupdate", syncTime);
@@ -138,6 +167,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
     if (!track.audioUrl) {
       getAudio()?.pause();
       lastLoadedTrackId = null;
+      playCountGateTrackId = null;
+      playCountRecordedForLoad = false;
       set({ currentTrack: track });
       return;
     }
@@ -148,6 +179,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
     }
 
     lastLoadedTrackId = track.id;
+    playCountGateTrackId = track.id;
+    playCountRecordedForLoad = false;
     a.src = track.audioUrl;
     a.load();
     set({
@@ -168,6 +201,17 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
     currentTimeSec: 0,
     durationSec: 0,
     playbackError: null,
+    shuffle: false,
+    volume: 1,
+
+    toggleShuffle: () => set((s) => ({ shuffle: !s.shuffle })),
+
+    setVolume: (v) => {
+      const nv = Math.max(0, Math.min(1, v));
+      const a = getAudio();
+      if (a) a.volume = nv;
+      set({ volume: nv });
+    },
 
     clearPlaybackError: () => set({ playbackError: null }),
 
@@ -218,20 +262,42 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
     },
 
     nextTrack: () => {
-      const { queue, queueIndex } = get();
+      const { queue, queueIndex, shuffle } = get();
       if (!queue.length) return;
+
+      if (shuffle && queue.length > 1) {
+        let nextIdx = queueIndex;
+        for (let i = 0; i < 48 && nextIdx === queueIndex; i++) {
+          nextIdx = Math.floor(Math.random() * queue.length);
+        }
+        const next = queue[nextIdx];
+        set({ queueIndex: nextIdx });
+        loadAudioSource(next);
+        void get().play();
+        return;
+      }
 
       if (queueIndex < queue.length - 1) {
         const nextIdx = queueIndex + 1;
         const next = queue[nextIdx];
         set({ queueIndex: nextIdx });
         loadAudioSource(next);
-        void get()
-          .play()
-          .then((ok) => {
-            if (ok) void recordTrackPlay(next.id);
-          });
+        void get().play();
       } else {
+        if (shuffle && queue.length > 0) {
+          let nextIdx = queueIndex;
+          if (queue.length > 1) {
+            let guard = 0;
+            while (nextIdx === queueIndex && guard++ < 48) {
+              nextIdx = Math.floor(Math.random() * queue.length);
+            }
+          }
+          const next = queue[nextIdx];
+          set({ queueIndex: nextIdx });
+          loadAudioSource(next);
+          void get().play();
+          return;
+        }
         get().pause();
         const a = getAudio();
         if (a) a.currentTime = 0;
@@ -258,11 +324,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
         const prev = queue[prevIdx];
         set({ queueIndex: prevIdx });
         loadAudioSource(prev);
-        void get()
-          .play()
-          .then((ok) => {
-            if (ok) void recordTrackPlay(prev.id);
-          });
+        void get().play();
       } else if (a) {
         a.currentTime = 0;
         set({ progress: 0, currentTimeSec: 0 });
@@ -279,8 +341,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
       const idx = Math.max(0, q.findIndex((t) => t.id === track.id));
       set({ queue: q, queueIndex: idx });
       loadAudioSource(track);
-      const ok = await get().play();
-      if (ok) void recordTrackPlay(track.id);
+      await get().play();
     },
 
     setQueue: (tracks, startIndex = 0) => {

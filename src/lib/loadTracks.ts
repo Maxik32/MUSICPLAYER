@@ -1,6 +1,11 @@
-import { demoTracks } from "@/data/mockData";
 import { getSupabase } from "@/lib/supabaseClient";
 import type { PlayerTrack } from "@/store/usePlayerStore";
+
+/**
+ * Колонки для `tracks`. После миграции `003_tracks_album.sql` можно добавить: `album`.
+ */
+export const TRACKS_SELECT =
+  "id,title,artist,description,audio_url,cover_url,play_count,created_at";
 
 function pickStr(row: Record<string, unknown>, ...keys: string[]): string {
   for (const k of keys) {
@@ -10,7 +15,6 @@ function pickStr(row: Record<string, unknown>, ...keys: string[]): string {
   return "";
 }
 
-/** Accepts DB rows or JSON objects (camelCase or snake_case). */
 export function normalizeTrackRow(row: Record<string, unknown>): PlayerTrack | null {
   const id = pickStr(row, "id");
   const title = pickStr(row, "title");
@@ -20,6 +24,7 @@ export function normalizeTrackRow(row: Record<string, unknown>): PlayerTrack | n
 
   const coverUrl = pickStr(row, "coverUrl", "cover_url");
   const description = pickStr(row, "description");
+  const album = pickStr(row, "album");
   const pc = row.play_count ?? row.playCount;
   const playCount =
     typeof pc === "number" && Number.isFinite(pc) ? pc : undefined;
@@ -29,19 +34,21 @@ export function normalizeTrackRow(row: Record<string, unknown>): PlayerTrack | n
     title,
     artist,
     audioUrl,
+    ...(album ? { album } : {}),
     ...(coverUrl ? { coverUrl } : {}),
     ...(description ? { description } : {}),
     ...(playCount !== undefined ? { playCount } : {}),
   };
 }
 
-export async function fetchTracksFromSupabase(): Promise<PlayerTrack[]> {
+/** Все треки только из Supabase (без mock / локальных JSON). */
+export async function fetchAllTracksFromSupabase(): Promise<PlayerTrack[]> {
   const sb = getSupabase();
   if (!sb) return [];
 
   const { data, error } = await sb
     .from("tracks")
-    .select("id,title,artist,description,audio_url,cover_url,play_count,created_at")
+    .select(TRACKS_SELECT)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -52,38 +59,4 @@ export async function fetchTracksFromSupabase(): Promise<PlayerTrack[]> {
   return (data ?? [])
     .map((row) => normalizeTrackRow(row as Record<string, unknown>))
     .filter((t): t is PlayerTrack => t != null);
-}
-
-/** Optional `public/user-tracks.json` — см. `user-tracks.example.json`. */
-export async function fetchUserTracksFile(): Promise<PlayerTrack[]> {
-  try {
-    const res = await fetch("/user-tracks.json", { cache: "no-store" });
-    if (!res.ok) return [];
-    const raw: unknown = await res.json();
-    if (!Array.isArray(raw)) return [];
-    return raw
-      .map((item) => normalizeTrackRow(item as Record<string, unknown>))
-      .filter((t): t is PlayerTrack => t != null);
-  } catch {
-    return [];
-  }
-}
-
-export type LoadedTracksMeta = {
-  tracks: PlayerTrack[];
-  supabaseCount: number;
-  fileCount: number;
-};
-
-export async function loadAllTracks(): Promise<LoadedTracksMeta> {
-  const [fromDb, fromFile] = await Promise.all([
-    fetchTracksFromSupabase(),
-    fetchUserTracksFile(),
-  ]);
-
-  return {
-    tracks: [...fromDb, ...fromFile, ...demoTracks],
-    supabaseCount: fromDb.length,
-    fileCount: fromFile.length,
-  };
 }

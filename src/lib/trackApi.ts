@@ -1,5 +1,5 @@
 import { getSupabase } from "@/lib/supabaseClient";
-import { normalizeTrackRow } from "@/lib/loadTracks";
+import { normalizeTrackRow, TRACKS_SELECT } from "@/lib/loadTracks";
 import type { PlayerTrack } from "@/store/usePlayerStore";
 
 function rowToTrack(row: Record<string, unknown>): PlayerTrack | null {
@@ -11,7 +11,7 @@ export async function fetchChartTracks(limit = 30): Promise<PlayerTrack[]> {
   if (!sb) return [];
   const { data, error } = await sb
     .from("tracks")
-    .select("id,title,artist,description,audio_url,cover_url,play_count,created_at")
+    .select(TRACKS_SELECT)
     .order("play_count", { ascending: false })
     .limit(limit);
   if (error) {
@@ -40,7 +40,7 @@ export async function fetchFavoriteTracks(
   if (!ids.length) return [];
   const { data: tracks, error: e2 } = await sb
     .from("tracks")
-    .select("id,title,artist,description,audio_url,cover_url,play_count,created_at")
+    .select(TRACKS_SELECT)
     .in("id", ids);
   if (e2) {
     console.warn("[favorites tracks]", e2.message);
@@ -181,7 +181,7 @@ export async function fetchPlaylistTracks(
   if (!ids.length) return [];
   const { data: tracks, error: e2 } = await sb
     .from("tracks")
-    .select("id,title,artist,description,audio_url,cover_url,play_count,created_at")
+    .select(TRACKS_SELECT)
     .in("id", ids);
   if (e2) return [];
   return (tracks ?? [])
