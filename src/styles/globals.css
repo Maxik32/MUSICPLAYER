@@ -1,0 +1,372 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --------------------------------------------------------------------------
+   Early iOS / iPod skeuomorphic design tokens
+   -------------------------------------------------------------------------- */
+:root {
+  --ios-blue-top: #5ba4e5;
+  --ios-blue-mid: #2477d1;
+  --ios-blue-bottom: #1159b3;
+  --metal-top: #e8e8e8;
+  --metal-mid: #b0b0b0;
+  --metal-dark: #909090;
+  --metal-bottom: #7a7a7a;
+  --list-separator: #e0e0e0;
+  --inset-track: #f3f3f3;
+  --progress-blue-top: #6eb6ff;
+  --progress-blue-bottom: #1a6fd4;
+  --pinstripe-1: #c5c5c5;
+  --pinstripe-2: #d8d8d8;
+  --linen-bg: #2b2b2b;
+  --linen-fg: rgba(255, 255, 255, 0.04);
+}
+
+@layer base {
+  html {
+    @apply font-ios antialiased;
+  }
+
+  body {
+    @apply m-0 min-h-screen text-neutral-900;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Background textures (pinstripe / dark linen)
+   -------------------------------------------------------------------------- */
+.pinstripe-bg {
+  background-color: #d0d0d0;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--pinstripe-1) 0px,
+    var(--pinstripe-1) 1px,
+    var(--pinstripe-2) 1px,
+    var(--pinstripe-2) 3px
+  );
+}
+
+.dark-linen-bg {
+  background-color: var(--linen-bg);
+  background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      var(--linen-fg) 2px,
+      var(--linen-fg) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      var(--linen-fg) 2px,
+      var(--linen-fg) 4px
+    );
+}
+
+/* Subtle polished “floor” for cover-flow style areas */
+.polished-floor-bg {
+  background: linear-gradient(to bottom, #f0f0f0 0%, #ffffff 55%, #e5e5e5 100%);
+}
+
+/* --------------------------------------------------------------------------
+   Metallic chrome bars (status / header)
+   -------------------------------------------------------------------------- */
+.metallic-bg {
+  background: linear-gradient(
+    to bottom,
+    #e0e0e0 0%,
+    #cfcfcf 8%,
+    #b0b0b0 50%,
+    #909090 51%,
+    #b8b8b8 100%
+  );
+  border-bottom: 1px solid #666;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.metallic-bg--compact {
+  background: linear-gradient(
+    to bottom,
+    #cfcfcf 0%,
+    #8e8e8e 50%,
+    #7f7f7f 50%,
+    #666666 100%
+  );
+  border-bottom: 1px solid #444;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+/* --------------------------------------------------------------------------
+   Engraved / inset typography
+   -------------------------------------------------------------------------- */
+.inset-text {
+  color: #1a1a1a;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.inset-text--on-metal {
+  color: #222;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.75), 0 -1px 0 rgba(0, 0, 0, 0.08);
+}
+
+.inset-text--light {
+  color: #fff;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.45);
+}
+
+/* --------------------------------------------------------------------------
+   Glossy physical buttons
+   -------------------------------------------------------------------------- */
+.glossy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: #222;
+  border: 1px solid #6a6a6a;
+  border-radius: 6px;
+  background: linear-gradient(
+    to bottom,
+    #ffffff 0%,
+    #e4e4e4 45%,
+    #c8c8c8 50%,
+    #dedede 100%
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.25);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  user-select: none;
+  transition: filter 0.08s ease;
+}
+
+.glossy-btn:hover {
+  filter: brightness(1.03);
+}
+
+.glossy-btn:active {
+  background: linear-gradient(
+    to bottom,
+    #d0d0d0 0%,
+    #b8b8b8 50%,
+    #a8a8a8 51%,
+    #c0c0c0 100%
+  );
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.glossy-btn--primary {
+  color: #fff;
+  border-color: #0d4a8f;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.35);
+  background: linear-gradient(
+    to bottom,
+    var(--ios-blue-top) 0%,
+    var(--ios-blue-mid) 50%,
+    var(--ios-blue-bottom) 50%,
+    #0d4a8f 100%
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.glossy-btn--primary:active {
+  background: linear-gradient(
+    to bottom,
+    #1e6bb8 0%,
+    #155a9e 50%,
+    #0f4a84 100%
+  );
+}
+
+/* --------------------------------------------------------------------------
+   Classic iOS table list rows
+   -------------------------------------------------------------------------- */
+.ios-list {
+  @apply overflow-hidden rounded-lg border border-neutral-400/80 bg-white;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6), 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.ios-list-header {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.35);
+  background: linear-gradient(
+    to bottom,
+    #8fa8c4 0%,
+    #5a7aa6 50%,
+    #3d5a80 50%,
+    #4a6d96 100%
+  );
+  border-bottom: 1px solid #2f4a63;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.ios-list-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #000;
+  background: #fff;
+  border-bottom: 1px solid var(--list-separator);
+  cursor: pointer;
+  user-select: none;
+}
+
+.ios-list-item:last-child {
+  border-bottom: none;
+}
+
+.ios-list-item--alt {
+  background: #f7f7f7;
+}
+
+.ios-list-item--selected {
+  color: #fff;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  border-bottom-color: rgba(0, 0, 0, 0.12);
+  background: linear-gradient(
+    to bottom,
+    var(--ios-blue-top) 0%,
+    var(--ios-blue-mid) 50%,
+    var(--ios-blue-bottom) 50%,
+    var(--ios-blue-bottom) 100%
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.ios-list-chevron {
+  flex-shrink: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-right: 0.15rem;
+  border-right: 2px solid #c0c0c0;
+  border-bottom: 2px solid #c0c0c0;
+  transform: rotate(-45deg);
+  opacity: 0.85;
+}
+
+.ios-list-item--selected .ios-list-chevron {
+  border-color: #fff;
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Inset field (search)
+   -------------------------------------------------------------------------- */
+.inset-field {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #222;
+  background: linear-gradient(to bottom, #e2e2e2 0%, #f8f8f8 100%);
+  border: 1px solid #999;
+  border-radius: 8px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(0, 0, 0, 0.05);
+  outline: none;
+}
+
+.inset-field:focus {
+  border-color: #2477d1;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15),
+    0 0 0 2px rgba(36, 119, 209, 0.25);
+}
+
+.inset-field::placeholder {
+  color: #888;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   Progress / scrubber (grooved track + glossy fill)
+   -------------------------------------------------------------------------- */
+.ios-progress {
+  position: relative;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--inset-track);
+  border: 1px solid #b0b0b0;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.28);
+}
+
+.ios-progress__fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  max-width: 100%;
+  border-radius: 4px;
+  background: linear-gradient(
+    to bottom,
+    var(--progress-blue-top) 0%,
+    var(--progress-blue-bottom) 55%,
+    #0d5cb8 100%
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.ios-progress__thumb {
+  position: absolute;
+  top: 50%;
+  width: 8px;
+  height: 18px;
+  margin-top: -9px;
+  margin-left: -4px;
+  border-radius: 2px;
+  border: 1px solid #0a4a96;
+  background: linear-gradient(
+    to bottom,
+    #9fd0ff 0%,
+    #3a8ee5 45%,
+    #1a6fd4 100%
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* --------------------------------------------------------------------------
+   Album art + Cover Flow style reflection
+   -------------------------------------------------------------------------- */
+.cover-reflect {
+  -webkit-box-reflect: below 0
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.35) 0%,
+      transparent 45%,
+      transparent 100%
+    );
+}
+
+/* Fallback when -webkit-box-reflect is unsupported */
+@supports not (-webkit-box-reflect: below 0 linear-gradient(#fff, #fff)) {
+  .cover-reflect {
+    box-shadow: 0 12px 16px -8px rgba(0, 0, 0, 0.25);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Volume slider track (metallic groove)
+   -------------------------------------------------------------------------- */
+.ios-volume-track {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(to bottom, #ddd 0%, #f5f5f5 100%);
+  border: 1px solid #9a9a9a;
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.25);
+}
