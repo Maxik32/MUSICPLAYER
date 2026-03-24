@@ -25,7 +25,7 @@ export function FullscreenNowPlaying() {
     <div
       className="fixed inset-x-0 top-0 z-[200] flex flex-col bg-white dark:bg-neutral-950"
       style={{
-        bottom: "calc(10.5rem + env(safe-area-inset-bottom, 0px))",
+        bottom: 0,
       }}
       role="dialog"
       aria-modal="true"

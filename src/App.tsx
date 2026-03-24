@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
 import { AboutPage } from "@/pages/AboutPage";
+import { ArtistPage } from "@/pages/ArtistPage";
 import { CollectionPage } from "@/pages/CollectionPage";
 import { HomePage } from "@/pages/HomePage";
 import { TrackPage } from "@/pages/TrackPage";
@@ -16,6 +17,7 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/collection" element={<CollectionPage />} />
           <Route path="/track/:trackId" element={<TrackPage />} />
+          <Route path="/artist/:artistName" element={<ArtistPage />} />
           <Route path="/favorites" element={<FavoritesPage />} />
           <Route path="/playlist/:playlistId" element={<PlaylistPage />} />
           <Route path="/settings" element={<SettingsPage />} />

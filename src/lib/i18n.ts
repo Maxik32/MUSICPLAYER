@@ -70,6 +70,15 @@ export const STRINGS: Record<
     "settings.langEn": "English",
     "settings.bgNote":
       "Фон применяется ко всей странице. В тёмной теме каждый вариант даёт свой оттенок.",
+    "settings.nickname": "Ник",
+    "settings.nicknamePlaceholder": "Введите ник",
+    "settings.password": "Новый пароль",
+    "settings.passwordPlaceholder": "Введите новый пароль",
+    "settings.save": "Сохранить",
+    "settings.nicknameSaved": "Ник обновлён",
+    "settings.passwordSaved": "Пароль обновлён",
+    "settings.passwordMin": "Минимум 6 символов",
+    "settings.saveFailed": "Не удалось сохранить изменения",
     "settings.back": "← На главную",
     "about.title": "О нас",
     "about.p1":
@@ -90,6 +99,10 @@ export const STRINGS: Record<
     "cover.title": "Cover Flow · очередь",
     "cover.hint":
       "Запустите трек из чарта или каталога — обложки выстроятся по очереди.",
+    "artist.title": "Исполнитель",
+    "artist.tracks": "Треки исполнителя",
+    "artist.empty": "У этого исполнителя пока нет треков.",
+    "artist.back": "← На главную",
   },
   en: {
     "nav.menu": "Menu",
@@ -157,6 +170,15 @@ export const STRINGS: Record<
     "settings.langEn": "English",
     "settings.bgNote":
       "Background applies app-wide. In dark theme each option sets a different base tone.",
+    "settings.nickname": "Nickname",
+    "settings.nicknamePlaceholder": "Enter nickname",
+    "settings.password": "New password",
+    "settings.passwordPlaceholder": "Enter new password",
+    "settings.save": "Save",
+    "settings.nicknameSaved": "Nickname updated",
+    "settings.passwordSaved": "Password updated",
+    "settings.passwordMin": "At least 6 characters",
+    "settings.saveFailed": "Could not save changes",
     "settings.back": "← Home",
     "about.title": "About",
     "about.p1":
@@ -177,6 +199,10 @@ export const STRINGS: Record<
     "cover.title": "Cover Flow · queue",
     "cover.hint":
       "Start a track from the chart or catalog — covers follow the queue.",
+    "artist.title": "Artist",
+    "artist.tracks": "Artist tracks",
+    "artist.empty": "No tracks found for this artist.",
+    "artist.back": "← Home",
   },
 };
 

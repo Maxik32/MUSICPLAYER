@@ -34,11 +34,11 @@ const WHEEL_ICON =
 
 /** Обложка, «колесо» и вертикальная громкость — одна высота; «экран» не ниже этого блока. */
 const BLOCK_H =
-  "h-16 w-16 min-h-16 min-w-16 min-[381px]:h-[4.5rem] min-[381px]:w-[4.5rem] min-[381px]:min-h-[4.5rem] min-[381px]:min-w-[4.5rem] sm:h-24 sm:w-24 sm:min-h-[6rem] sm:min-w-[6rem] md:h-[7.25rem] md:w-[7.25rem] md:min-h-[7.25rem] md:min-w-[7.25rem]";
+  "h-[4.9rem] w-[4.9rem] min-h-[4.9rem] min-w-[4.9rem] min-[381px]:h-[5.1rem] min-[381px]:w-[5.1rem] min-[381px]:min-h-[5.1rem] min-[381px]:min-w-[5.1rem] sm:h-24 sm:w-24 sm:min-h-[6rem] sm:min-w-[6rem] md:h-[7.25rem] md:w-[7.25rem] md:min-h-[7.25rem] md:min-w-[7.25rem]";
 const VOL_TRACK_H =
-  "h-16 min-[381px]:h-[4.5rem] sm:h-24 md:h-[7.25rem]";
+  "h-[4.9rem] min-[381px]:h-[5.1rem] sm:h-24 md:h-[7.25rem]";
 const SCREEN_MIN_H =
-  "min-h-16 min-[381px]:min-h-[4.5rem] sm:min-h-24 md:min-h-[7.25rem]";
+  "min-h-[4.9rem] min-[381px]:min-h-[5.1rem] sm:min-h-24 md:min-h-[7.25rem]";
 
 function VerticalVolume({
   value,
@@ -276,7 +276,7 @@ export function BottomPlayer() {
 
           {/* Click wheel */}
           <div
-            className={`relative mx-auto box-border shrink-0 overflow-hidden rounded-full border-2 border-[#c5c9d1] bg-white shadow-[inset_0_2px_10px_rgba(0,0,0,0.05),0_2px_6px_rgba(0,0,0,0.06)] ${BLOCK_H}`}
+            className={`relative box-border shrink-0 overflow-hidden rounded-full border-2 border-[#c5c9d1] bg-white shadow-[inset_0_2px_10px_rgba(0,0,0,0.05),0_2px_6px_rgba(0,0,0,0.06)] ${BLOCK_H}`}
           >
             <div
               className="absolute left-1/2 top-1/2 h-[30%] w-[30%] min-h-[1.5rem] min-w-[1.5rem] max-h-[2.1rem] max-w-[2.1rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#d8dce3] shadow-[inset_0_2px_4px_rgba(0,0,0,0.08)] sm:max-h-[2.35rem] sm:max-w-[2.35rem] md:max-h-[2.5rem] md:max-w-[2.5rem]"
@@ -287,30 +287,30 @@ export function BottomPlayer() {
             />
             <button
               type="button"
-              className={`absolute left-1/2 top-0.5 z-10 flex h-6 w-10 -translate-x-1/2 items-center justify-center rounded-full border-0 bg-transparent max-[380px]:h-5 max-[380px]:w-9 ${WHEEL_ICON} ${shuffle ? "!text-[#3e5c82]" : ""}`}
+              className={`absolute left-1/2 top-0.5 z-10 flex h-6 w-10 -translate-x-1/2 items-center justify-center rounded-full border-0 bg-transparent ${WHEEL_ICON} ${shuffle ? "!text-[#3e5c82]" : ""}`}
               aria-label={t("player.shuffle")}
               aria-pressed={shuffle}
               disabled={!canControl}
               onClick={() => toggleShuffle()}
             >
-              <Shuffle className="h-3.5 w-3.5" strokeWidth={2.1} />
+              <Shuffle className="h-3.5 w-3.5" strokeWidth={2.2} />
             </button>
             <button
               type="button"
-              className={`absolute bottom-0.5 left-1/2 z-10 flex h-6 w-11 -translate-x-1/2 items-center justify-center rounded-full border-0 bg-transparent max-[380px]:h-5 max-[380px]:w-10 ${WHEEL_ICON}`}
+              className={`absolute bottom-0.5 left-1/2 z-10 flex h-6 w-11 -translate-x-1/2 items-center justify-center rounded-full border-0 bg-transparent ${WHEEL_ICON}`}
               aria-label={isPlaying ? t("player.pause") : t("player.play")}
               disabled={!canControl}
               onClick={() => void togglePlay()}
             >
               {isPlaying ? (
                 <Pause
-                  className="h-[15px] w-[15px]"
+                  className="h-4 w-4"
                   fill="currentColor"
                   strokeWidth={2}
                 />
               ) : (
                 <Play
-                  className="h-[15px] w-[15px] translate-x-px"
+                  className="h-4 w-4 translate-x-px"
                   fill="currentColor"
                   strokeWidth={2}
                 />
@@ -318,27 +318,27 @@ export function BottomPlayer() {
             </button>
             <button
               type="button"
-              className={`absolute left-0.5 top-1/2 z-10 flex h-11 w-7 -translate-y-1/2 items-center justify-center rounded-full border-0 bg-transparent max-[380px]:h-10 max-[380px]:w-6 ${WHEEL_ICON}`}
+              className={`absolute left-0.5 top-1/2 z-10 flex h-11 w-7 -translate-y-1/2 items-center justify-center rounded-full border-0 bg-transparent ${WHEEL_ICON}`}
               aria-label={t("player.prev")}
               disabled={!canControl}
               onClick={() => prevTrack()}
             >
-              <SkipBack className="h-[15px] w-[15px]" strokeWidth={2.1} />
+              <SkipBack className="h-4 w-4" strokeWidth={2.2} />
             </button>
             <button
               type="button"
-              className={`absolute right-0.5 top-1/2 z-10 flex h-11 w-7 -translate-y-1/2 items-center justify-center rounded-full border-0 bg-transparent max-[380px]:h-10 max-[380px]:w-6 ${WHEEL_ICON}`}
+              className={`absolute right-0.5 top-1/2 z-10 flex h-11 w-7 -translate-y-1/2 items-center justify-center rounded-full border-0 bg-transparent ${WHEEL_ICON}`}
               aria-label={t("player.next")}
               disabled={!canControl}
               onClick={() => nextTrack()}
             >
-              <SkipForward className="h-[15px] w-[15px]" strokeWidth={2.1} />
+              <SkipForward className="h-4 w-4" strokeWidth={2.2} />
             </button>
           </div>
 
           {/* Экран */}
           <div
-            className={`flex min-w-0 flex-1 flex-col justify-center self-stretch ${SCREEN_MIN_H}`}
+            className={`flex min-w-0 flex-1 flex-col justify-center self-stretch max-sm:max-w-[calc(100%-6.8rem)] ${SCREEN_MIN_H}`}
           >
             <div
               className="flex h-full min-h-0 flex-col rounded-xl border border-[#c8ccd4] px-2 pb-1.5 pt-1 shadow-[inset_0_3px_10px_rgba(0,0,0,0.08)] sm:px-2.5 sm:pb-2 sm:pt-1.5 md:px-3 md:pt-2"
@@ -347,25 +347,27 @@ export function BottomPlayer() {
               }}
             >
               <div className="mb-0.5 flex items-center justify-between gap-1.5 sm:mb-1 sm:gap-2">
-                <button
-                  type="button"
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#d0d4dc] bg-gradient-to-b from-white to-[#eceef2] text-[#3c3c3c] shadow-sm transition hover:brightness-[1.02] active:translate-y-px disabled:opacity-35 max-[380px]:h-6 max-[380px]:w-6 sm:h-8 sm:w-8"
-                  aria-label={t("player.addToPlaylist")}
-                  disabled={!currentTrack}
-                  onClick={openPlaylist}
-                >
-                  <ListPlus className="h-3.5 w-3.5 max-[380px]:h-3 max-[380px]:w-3 sm:h-4 sm:w-4" strokeWidth={2.1} />
-                </button>
-                <button
-                  type="button"
-                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#d0d4dc] bg-gradient-to-b from-white to-[#eceef2] shadow-sm transition hover:brightness-[1.02] active:translate-y-px disabled:opacity-35 max-[380px]:h-6 max-[380px]:w-6 sm:h-8 sm:w-8 ${repeat ? "text-[#3e5c82]" : "text-[#3c3c3c]"}`}
-                  aria-label={t("player.repeat")}
-                  aria-pressed={repeat}
-                  disabled={!canControl}
-                  onClick={() => toggleRepeat()}
-                >
-                  <Repeat className="h-3.5 w-3.5 max-[380px]:h-3 max-[380px]:w-3 sm:h-4 sm:w-4" strokeWidth={2.1} />
-                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#d0d4dc] bg-gradient-to-b from-white to-[#eceef2] text-[#3c3c3c] shadow-sm transition hover:brightness-[1.02] active:translate-y-px disabled:opacity-35 max-[380px]:h-6 max-[380px]:w-6 sm:h-8 sm:w-8"
+                    aria-label={t("player.addToPlaylist")}
+                    disabled={!currentTrack}
+                    onClick={openPlaylist}
+                  >
+                    <ListPlus className="h-3.5 w-3.5 max-[380px]:h-3 max-[380px]:w-3 sm:h-4 sm:w-4" strokeWidth={2.1} />
+                  </button>
+                  <button
+                    type="button"
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#d0d4dc] bg-gradient-to-b from-white to-[#eceef2] shadow-sm transition hover:brightness-[1.02] active:translate-y-px disabled:opacity-35 max-[380px]:h-6 max-[380px]:w-6 sm:h-8 sm:w-8 ${repeat ? "text-[#3e5c82]" : "text-[#3c3c3c]"}`}
+                    aria-label={t("player.repeat")}
+                    aria-pressed={repeat}
+                    disabled={!canControl}
+                    onClick={() => toggleRepeat()}
+                  >
+                    <Repeat className="h-3.5 w-3.5 max-[380px]:h-3 max-[380px]:w-3 sm:h-4 sm:w-4" strokeWidth={2.1} />
+                  </button>
+                </div>
                 <button
                   type="button"
                   className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#d0d4dc] bg-gradient-to-b from-white to-[#eceef2] shadow-sm transition hover:brightness-[1.02] active:translate-y-px disabled:opacity-35 max-[380px]:h-6 max-[380px]:w-6 sm:h-8 sm:w-8"

@@ -4,8 +4,8 @@ import type { PlayerTrack } from "@/store/usePlayerStore";
 import { usePlayerStore } from "@/store/usePlayerStore";
 
 const SIDE = 2; // only two cards on each side
-const COVER_W = 136;
-const COVER_H = 136;
+const COVER_W = 176;
+const COVER_H = 176;
 
 type SlotCfg = {
   x: number;
@@ -20,9 +20,9 @@ const Z_FOR_DIST: Record<1 | 2, number> = { 1: 56, 2: 34 };
 
 const LEFT_CFG: SlotCfg[] = [
   // far (d=2)
-  { x: -230, rotateY: 52, translateZ: -70, scale: 0.6, zIndex: Z_FOR_DIST[2] },
+  { x: -270, rotateY: 52, translateZ: -70, scale: 0.64, zIndex: Z_FOR_DIST[2] },
   // near (d=1)
-  { x: -110, rotateY: 44, translateZ: -34, scale: 0.78, zIndex: Z_FOR_DIST[1] },
+  { x: -135, rotateY: 44, translateZ: -34, scale: 0.82, zIndex: Z_FOR_DIST[1] },
 ];
 
 /** R0 sits next to center like L2; R2 is the far right like L0 — same depth → same z-index as the symmetric left slot. */
@@ -41,7 +41,7 @@ const CENTER_CFG: SlotCfg = {
   x: 0,
   rotateY: 0,
   translateZ: 96,
-  scale: 1.14,
+  scale: 1.2,
   zIndex: 100,
 };
 
@@ -54,7 +54,7 @@ function CoverArt({
 }) {
   return (
     <div
-      className={`cover-reflect overflow-hidden rounded-md border-2 border-neutral-400 bg-gradient-to-br from-[#e9e9e9] via-[#cfcfcf] to-[#9a9a9a] shadow-[0_12px_28px_rgba(0,0,0,0.35)] ${
+      className={`overflow-hidden rounded-md border-2 border-neutral-400 bg-gradient-to-br from-[#e9e9e9] via-[#cfcfcf] to-[#9a9a9a] shadow-[0_10px_22px_rgba(0,0,0,0.28)] ${
         dimmed ? "opacity-45" : ""
       }`}
       style={{ width: COVER_W, height: COVER_H }}
@@ -159,7 +159,7 @@ export function CoverFlow({ previewTrack }: { previewTrack: PlayerTrack | null }
       </div>
 
       <div
-        className="cover-flow-stage relative mx-auto h-[240px] w-full max-w-4xl overflow-hidden px-1 pb-2 pt-2 sm:h-[280px] sm:overflow-visible sm:px-2 sm:pt-4"
+        className="cover-flow-stage relative mx-auto h-[300px] w-full max-w-4xl overflow-hidden px-1 pb-2 pt-2 sm:h-[350px] sm:overflow-visible sm:px-2 sm:pt-4"
         style={{ touchAction: "pan-y" }}
         onPointerDown={(e) => {
           if (e.target !== e.currentTarget) return; // keep clicks on cards working
@@ -185,7 +185,7 @@ export function CoverFlow({ previewTrack }: { previewTrack: PlayerTrack | null }
         }}
       >
         <div
-          className="cover-flow-pivot absolute left-1/2 top-[40%] w-0 -translate-x-1/2 -translate-y-1/2 max-[520px]:scale-[0.5] max-[520px]:origin-[50%_45%] sm:top-[42%] sm:scale-100"
+          className="cover-flow-pivot absolute left-1/2 top-[45%] w-0 -translate-x-1/2 -translate-y-1/2 max-[520px]:scale-[0.72] max-[520px]:origin-[50%_45%] sm:top-[46%] sm:scale-100"
           style={{ height: COVER_H, transformStyle: "preserve-3d" }}
         >
           {LEFT_CFG.map((cfg, i) => (

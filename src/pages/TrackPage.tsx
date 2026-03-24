@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Album } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { splitArtists } from "@/lib/artists";
 import { useI18n } from "@/hooks/useI18n";
 import { getSupabase } from "@/lib/supabaseClient";
 import { TRACKS_SELECT, normalizeTrackRow } from "@/lib/loadTracks";
@@ -9,6 +10,7 @@ import type { PlayerTrack } from "@/store/usePlayerStore";
 export function TrackPage() {
   const { t } = useI18n();
   const { trackId } = useParams();
+  const navigate = useNavigate();
 
   const [track, setTrack] = useState<PlayerTrack | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -91,7 +93,18 @@ export function TrackPage() {
               {track.title}
             </h1>
             <p className="mt-1 text-[13px] font-semibold text-neutral-600">
-              {track.artist}
+              {splitArtists(track.artist).map((artist, idx, arr) => (
+                <span key={`${track.id}-${artist}`}>
+                  <button
+                    type="button"
+                    className="text-[13px] font-semibold text-neutral-600 underline-offset-2 hover:underline"
+                    onClick={() => navigate(`/artist/${encodeURIComponent(artist)}`)}
+                  >
+                    {artist}
+                  </button>
+                  {idx < arr.length - 1 ? ", " : ""}
+                </span>
+              ))}
             </p>
           </>
         ) : null}

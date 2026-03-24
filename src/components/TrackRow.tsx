@@ -1,4 +1,5 @@
 import { Heart, ListMusic, Pause, Play } from "lucide-react";
+import { splitArtists } from "@/lib/artists";
 import type { PlayerTrack } from "@/store/usePlayerStore";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useNavigate } from "react-router-dom";
@@ -39,6 +40,7 @@ export function TrackRow({
   const showHeart = canFavorite && isUuid;
   const isThisPlaying =
     Boolean(isPlaying && currentTrack?.id && currentTrack.id === track.id);
+  const artistParts = splitArtists(track.artist);
 
   const openTrackPage = () => {
     onPlay();
@@ -93,7 +95,21 @@ export function TrackRow({
           {track.title}
         </p>
         <p className="truncate text-[11px] font-semibold text-neutral-600">
-          {track.artist}
+          {artistParts.map((artist, idx) => (
+            <span key={`${track.id}-${artist}`}>
+              <button
+                type="button"
+                className="max-w-[10rem] truncate align-bottom text-left text-[11px] font-semibold text-neutral-600 underline-offset-2 hover:underline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/artist/${encodeURIComponent(artist)}`);
+                }}
+              >
+                {artist}
+              </button>
+              {idx < artistParts.length - 1 ? ", " : ""}
+            </span>
+          ))}
         </p>
       </div>
 

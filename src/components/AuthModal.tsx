@@ -5,6 +5,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 type Mode = "login" | "register";
 
 type FormValues = {
+  nickname: string;
   email: string;
   password: string;
 };
@@ -26,7 +27,9 @@ export function AuthModal({
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<FormValues>({ defaultValues: { email: "", password: "" } });
+  } = useForm<FormValues>({
+    defaultValues: { nickname: "", email: "", password: "" },
+  });
 
   if (!open) return null;
 
@@ -38,7 +41,7 @@ export function AuthModal({
         reset();
         onClose();
       } else {
-        await signUp(v.email.trim(), v.password);
+        await signUp(v.email.trim(), v.password, v.nickname.trim());
         setMessage(
           "Аккаунт создан. Проверьте почту (если включено подтверждение) и войдите."
         );
@@ -78,6 +81,31 @@ export function AuthModal({
           onSubmit={handleSubmit(onSubmit)}
           className="space-y-3 bg-gradient-to-b from-white to-[#f4f4f4] p-4"
         >
+          <div>
+            {mode === "register" ? (
+              <>
+                <label className="mb-1 block text-[11px] font-bold text-neutral-700">
+                  Ник
+                </label>
+                <input
+                  type="text"
+                  autoComplete="nickname"
+                  className="inset-field"
+                  {...register("nickname", {
+                    required: "Укажите ник",
+                    minLength: { value: 2, message: "Минимум 2 символа" },
+                    maxLength: { value: 32, message: "Максимум 32 символа" },
+                  })}
+                />
+                {errors.nickname ? (
+                  <p className="mt-1 text-[10px] font-bold text-red-700">
+                    {errors.nickname.message}
+                  </p>
+                ) : null}
+              </>
+            ) : null}
+          </div>
+
           <div>
             <label className="mb-1 block text-[11px] font-bold text-neutral-700">
               Email

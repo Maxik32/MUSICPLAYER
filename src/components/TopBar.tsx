@@ -20,8 +20,10 @@ export function TopBar() {
   const playTrack = usePlayerStore((s) => s.playTrack);
 
   const user = useAuthStore((s) => s.user);
+  const nickname = useAuthStore((s) => s.nickname);
   const ready = useAuthStore((s) => s.ready);
   const signOut = useAuthStore((s) => s.signOut);
+  const displayName = nickname || user?.email || "";
 
   const searchWrapRef = useRef<HTMLDivElement>(null);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -137,7 +139,7 @@ export function TopBar() {
           ) : user ? (
             <>
               <span className="hidden max-w-[100px] truncate text-[10px] font-bold text-neutral-800 inset-text lg:inline dark:text-neutral-200">
-                {user.email}
+                {displayName}
               </span>
               <button
                 type="button"
