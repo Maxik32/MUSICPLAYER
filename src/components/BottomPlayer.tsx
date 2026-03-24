@@ -4,6 +4,7 @@ import {
   ListPlus,
   Pause,
   Play,
+  Repeat,
   Shuffle,
   SkipBack,
   SkipForward,
@@ -26,8 +27,8 @@ function formatTime(sec: number) {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-const IOS_BLUE_TOP = "#5eb0ff";
-const IOS_BLUE_BOTTOM = "#2d7edb";
+const BLUE_GRADIENT_TOP = "#91aac7";
+const BLUE_GRADIENT_BOTTOM = "#3e5c82";
 const WHEEL_ICON =
   "text-[#3c3c3c] hover:text-[#1a1a1a] disabled:opacity-35";
 
@@ -103,7 +104,7 @@ function VerticalVolume({
           className="pointer-events-none absolute bottom-0 left-0 right-0 rounded-b-full shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]"
           style={{
             height: `${pct}%`,
-            background: `linear-gradient(0deg, ${IOS_BLUE_BOTTOM} 0%, ${IOS_BLUE_TOP} 100%)`,
+            background: `linear-gradient(0deg, ${BLUE_GRADIENT_BOTTOM} 0%, #6b8fb3 50%, ${BLUE_GRADIENT_TOP} 100%)`,
             borderBottomLeftRadius: 9999,
             borderBottomRightRadius: 9999,
           }}
@@ -134,8 +135,10 @@ export function BottomPlayer() {
   const currentTimeSec = usePlayerStore((s) => s.currentTimeSec);
   const durationSec = usePlayerStore((s) => s.durationSec);
   const shuffle = usePlayerStore((s) => s.shuffle);
+  const repeat = usePlayerStore((s) => s.repeat);
   const volume = usePlayerStore((s) => s.volume);
   const toggleShuffle = usePlayerStore((s) => s.toggleShuffle);
+  const toggleRepeat = usePlayerStore((s) => s.toggleRepeat);
   const togglePlay = usePlayerStore((s) => s.togglePlay);
   const nextTrack = usePlayerStore((s) => s.nextTrack);
   const prevTrack = usePlayerStore((s) => s.prevTrack);
@@ -243,7 +246,7 @@ export function BottomPlayer() {
         ) : null}
 
         <div
-          className="flex items-stretch gap-1.5 rounded-2xl border border-[#a8adb6] p-1.5 shadow-[0_2px_8px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.85)] sm:gap-2 sm:p-2 md:gap-2.5 md:p-2.5"
+          className="flex items-stretch gap-1.5 rounded-2xl border border-[#a8adb6] p-1.5 shadow-[0_2px_8px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.85)] max-sm:gap-1 max-sm:p-1 sm:gap-2 sm:p-2 md:gap-2.5 md:p-2.5"
           style={{
             background:
               "linear-gradient(180deg, #eef0f4 0%, #e2e5eb 35%, #d5d9e1 70%, #cdd2db 100%)",
@@ -251,7 +254,7 @@ export function BottomPlayer() {
         >
           {/* Обложка */}
           <div
-            className={`relative box-border shrink-0 overflow-hidden rounded-xl border border-[#a8adb6] bg-gradient-to-b from-[#f4f5f7] to-[#dce0e8] shadow-[inset_0_2px_6px_rgba(0,0,0,0.06)] ${BLOCK_H}`}
+            className={`hidden sm:block relative box-border shrink-0 overflow-hidden rounded-xl border border-[#a8adb6] bg-gradient-to-b from-[#f4f5f7] to-[#dce0e8] shadow-[inset_0_2px_6px_rgba(0,0,0,0.06)] ${BLOCK_H}`}
           >
             {currentTrack?.coverUrl ? (
               <img
@@ -284,7 +287,7 @@ export function BottomPlayer() {
             />
             <button
               type="button"
-              className={`absolute left-1/2 top-0.5 z-10 flex h-6 w-10 -translate-x-1/2 items-center justify-center rounded-full border-0 bg-transparent ${WHEEL_ICON} ${shuffle ? "!text-[#2d7edb]" : ""}`}
+              className={`absolute left-1/2 top-0.5 z-10 flex h-6 w-10 -translate-x-1/2 items-center justify-center rounded-full border-0 bg-transparent max-[380px]:h-5 max-[380px]:w-9 ${WHEEL_ICON} ${shuffle ? "!text-[#3e5c82]" : ""}`}
               aria-label={t("player.shuffle")}
               aria-pressed={shuffle}
               disabled={!canControl}
@@ -294,7 +297,7 @@ export function BottomPlayer() {
             </button>
             <button
               type="button"
-              className={`absolute bottom-0.5 left-1/2 z-10 flex h-6 w-11 -translate-x-1/2 items-center justify-center rounded-full border-0 bg-transparent ${WHEEL_ICON}`}
+              className={`absolute bottom-0.5 left-1/2 z-10 flex h-6 w-11 -translate-x-1/2 items-center justify-center rounded-full border-0 bg-transparent max-[380px]:h-5 max-[380px]:w-10 ${WHEEL_ICON}`}
               aria-label={isPlaying ? t("player.pause") : t("player.play")}
               disabled={!canControl}
               onClick={() => void togglePlay()}
@@ -315,7 +318,7 @@ export function BottomPlayer() {
             </button>
             <button
               type="button"
-              className={`absolute left-0.5 top-1/2 z-10 flex h-11 w-7 -translate-y-1/2 items-center justify-center rounded-full border-0 bg-transparent ${WHEEL_ICON}`}
+              className={`absolute left-0.5 top-1/2 z-10 flex h-11 w-7 -translate-y-1/2 items-center justify-center rounded-full border-0 bg-transparent max-[380px]:h-10 max-[380px]:w-6 ${WHEEL_ICON}`}
               aria-label={t("player.prev")}
               disabled={!canControl}
               onClick={() => prevTrack()}
@@ -324,7 +327,7 @@ export function BottomPlayer() {
             </button>
             <button
               type="button"
-              className={`absolute right-0.5 top-1/2 z-10 flex h-11 w-7 -translate-y-1/2 items-center justify-center rounded-full border-0 bg-transparent ${WHEEL_ICON}`}
+              className={`absolute right-0.5 top-1/2 z-10 flex h-11 w-7 -translate-y-1/2 items-center justify-center rounded-full border-0 bg-transparent max-[380px]:h-10 max-[380px]:w-6 ${WHEEL_ICON}`}
               aria-label={t("player.next")}
               disabled={!canControl}
               onClick={() => nextTrack()}
@@ -346,16 +349,26 @@ export function BottomPlayer() {
               <div className="mb-0.5 flex items-center justify-between gap-1.5 sm:mb-1 sm:gap-2">
                 <button
                   type="button"
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#d0d4dc] bg-gradient-to-b from-white to-[#eceef2] text-[#3c3c3c] shadow-sm transition hover:brightness-[1.02] active:translate-y-px disabled:opacity-35 sm:h-8 sm:w-8"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#d0d4dc] bg-gradient-to-b from-white to-[#eceef2] text-[#3c3c3c] shadow-sm transition hover:brightness-[1.02] active:translate-y-px disabled:opacity-35 max-[380px]:h-6 max-[380px]:w-6 sm:h-8 sm:w-8"
                   aria-label={t("player.addToPlaylist")}
                   disabled={!currentTrack}
                   onClick={openPlaylist}
                 >
-                  <ListPlus className="h-3.5 w-3.5 sm:h-4 sm:w-4" strokeWidth={2.1} />
+                  <ListPlus className="h-3.5 w-3.5 max-[380px]:h-3 max-[380px]:w-3 sm:h-4 sm:w-4" strokeWidth={2.1} />
                 </button>
                 <button
                   type="button"
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#d0d4dc] bg-gradient-to-b from-white to-[#eceef2] shadow-sm transition hover:brightness-[1.02] active:translate-y-px disabled:opacity-35 sm:h-8 sm:w-8"
+                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#d0d4dc] bg-gradient-to-b from-white to-[#eceef2] shadow-sm transition hover:brightness-[1.02] active:translate-y-px disabled:opacity-35 max-[380px]:h-6 max-[380px]:w-6 sm:h-8 sm:w-8 ${repeat ? "text-[#3e5c82]" : "text-[#3c3c3c]"}`}
+                  aria-label={t("player.repeat")}
+                  aria-pressed={repeat}
+                  disabled={!canControl}
+                  onClick={() => toggleRepeat()}
+                >
+                  <Repeat className="h-3.5 w-3.5 max-[380px]:h-3 max-[380px]:w-3 sm:h-4 sm:w-4" strokeWidth={2.1} />
+                </button>
+                <button
+                  type="button"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#d0d4dc] bg-gradient-to-b from-white to-[#eceef2] shadow-sm transition hover:brightness-[1.02] active:translate-y-px disabled:opacity-35 max-[380px]:h-6 max-[380px]:w-6 sm:h-8 sm:w-8"
                   aria-label={
                     isFav ? t("player.unfavorite") : t("player.favorite")
                   }
@@ -363,7 +376,7 @@ export function BottomPlayer() {
                   onClick={() => void toggleFavorite()}
                 >
                   <Heart
-                    className="h-3.5 w-3.5 sm:h-4 sm:w-4"
+                    className="h-3.5 w-3.5 max-[380px]:h-3 max-[380px]:w-3 sm:h-4 sm:w-4"
                     strokeWidth={2.1}
                     fill={isFav ? "#ff3b30" : "none"}
                     stroke={isFav ? "#ff3b30" : "#3c3c3c"}
@@ -411,7 +424,7 @@ export function BottomPlayer() {
                   className="pointer-events-none absolute left-0 top-0 h-full rounded-full"
                   style={{
                     width: pct,
-                    background: `linear-gradient(180deg, ${IOS_BLUE_TOP} 0%, ${IOS_BLUE_BOTTOM} 100%)`,
+                    background: `linear-gradient(180deg, ${BLUE_GRADIENT_TOP} 0%, #6b8fb3 50%, ${BLUE_GRADIENT_BOTTOM} 100%)`,
                     boxShadow: "inset 0 1px 0 rgba(255,255,255,0.45)",
                   }}
                 />

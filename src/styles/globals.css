@@ -6,17 +6,17 @@
    Early iOS / iPod skeuomorphic design tokens
    -------------------------------------------------------------------------- */
 :root {
-  --ios-blue-top: #5ba4e5;
-  --ios-blue-mid: #2477d1;
-  --ios-blue-bottom: #1159b3;
+  --ios-blue-top: #91aac7;
+  --ios-blue-mid: #6b8fb3;
+  --ios-blue-bottom: #3e5c82;
+  --progress-blue-top: #91aac7;
+  --progress-blue-bottom: #3e5c82;
   --metal-top: #e8e8e8;
   --metal-mid: #b0b0b0;
   --metal-dark: #909090;
   --metal-bottom: #7a7a7a;
   --list-separator: #e0e0e0;
   --inset-track: #f3f3f3;
-  --progress-blue-top: #6eb6ff;
-  --progress-blue-bottom: #1a6fd4;
   --pinstripe-1: #c5c5c5;
   --pinstripe-2: #d8d8d8;
   --linen-bg: #2b2b2b;
@@ -106,10 +106,11 @@
   background: linear-gradient(
     to bottom,
     #e0e0e0 0%,
-    #cfcfcf 8%,
-    #b0b0b0 50%,
-    #909090 51%,
-    #b8b8b8 100%
+    #cfcfcf 15%,
+    #b8b8b8 45%,
+    #a0a0a0 65%,
+    #b0b0b0 85%,
+    #c0c0c0 100%
   );
   border-bottom: 1px solid #666;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
@@ -129,13 +130,14 @@
 
 .dark .metallic-bg--compact {
   background: linear-gradient(
-    to bottom,
-    #3a3a3a 0%,
-    #2a2a2a 50%,
-    #1c1c1c 50%,
-    #303030 100%
+    180deg,
+    #0d2a52 0%,
+    #0e3a6e 30%,
+    #1159b3 55%,
+    #0c2d55 80%,
+    #0b2550 100%
   );
-  border-bottom-color: #111;
+  border-bottom-color: #083056;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
@@ -146,14 +148,15 @@
 
 .metallic-bg--compact {
   background: linear-gradient(
-    to bottom,
-    #cfcfcf 0%,
-    #8e8e8e 50%,
-    #7f7f7f 50%,
-    #666666 100%
+    180deg,
+    #91aac7 0%,
+    #7a9bb8 30%,
+    #6b8fb3 55%,
+    #4e6d92 80%,
+    #3e5c82 100%
   );
-  border-bottom: 1px solid #444;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  border-bottom: 1px solid #2d4a6a;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 /* --------------------------------------------------------------------------
@@ -190,9 +193,9 @@
   background: linear-gradient(
     to bottom,
     #ffffff 0%,
-    #e4e4e4 45%,
-    #c8c8c8 50%,
-    #dedede 100%
+    #e8e8e8 35%,
+    #d8d8d8 60%,
+    #e0e0e0 100%
   );
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95),
     inset 0 -1px 0 rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.25);
@@ -210,9 +213,9 @@
   background: linear-gradient(
     to bottom,
     #d0d0d0 0%,
-    #b8b8b8 50%,
-    #a8a8a8 51%,
-    #c0c0c0 100%
+    #b8b8b8 40%,
+    #a8a8a8 70%,
+    #b8b8b8 100%
   );
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.35);
@@ -225,9 +228,9 @@
   background: linear-gradient(
     to bottom,
     var(--ios-blue-top) 0%,
-    var(--ios-blue-mid) 50%,
-    var(--ios-blue-bottom) 50%,
-    #0d4a8f 100%
+    var(--ios-blue-mid) 40%,
+    var(--ios-blue-bottom) 85%,
+    #2d4a6a 100%
   );
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35),
     inset 0 -1px 0 rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -236,9 +239,9 @@
 .glossy-btn--primary:active {
   background: linear-gradient(
     to bottom,
-    #1e6bb8 0%,
-    #155a9e 50%,
-    #0f4a84 100%
+    #5a8fbd 0%,
+    #3e6b9a 45%,
+    #2d5a82 100%
   );
 }
 
@@ -259,13 +262,14 @@
   color: #fff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.35);
   background: linear-gradient(
-    to bottom,
-    #8fa8c4 0%,
-    #5a7aa6 50%,
-    #3d5a80 50%,
-    #4a6d96 100%
+    180deg,
+    #91aac7 0%,
+    #7a9bb8 30%,
+    #6b8fb3 55%,
+    #4e6d92 80%,
+    #3e5c82 100%
   );
-  border-bottom: 1px solid #2f4a63;
+  border-bottom: 1px solid #2d4a6a;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
@@ -301,8 +305,7 @@
   background: linear-gradient(
     to bottom,
     var(--ios-blue-top) 0%,
-    var(--ios-blue-mid) 50%,
-    var(--ios-blue-bottom) 50%,
+    var(--ios-blue-mid) 40%,
     var(--ios-blue-bottom) 100%
   );
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
@@ -374,8 +377,8 @@
   background: linear-gradient(
     to bottom,
     var(--progress-blue-top) 0%,
-    var(--progress-blue-bottom) 55%,
-    #0d5cb8 100%
+    var(--ios-blue-mid) 50%,
+    var(--progress-blue-bottom) 100%
   );
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
 }
@@ -507,8 +510,8 @@
   background: linear-gradient(
     to bottom,
     var(--progress-blue-top) 0%,
-    var(--progress-blue-bottom) 55%,
-    #0d5cb8 100%
+    var(--ios-blue-mid) 50%,
+    var(--progress-blue-bottom) 100%
   );
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }

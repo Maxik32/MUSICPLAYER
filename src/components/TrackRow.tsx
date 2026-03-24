@@ -1,5 +1,7 @@
-import { Heart, ListMusic, Play } from "lucide-react";
+import { Heart, ListMusic, Pause, Play } from "lucide-react";
 import type { PlayerTrack } from "@/store/usePlayerStore";
+import { usePlayerStore } from "@/store/usePlayerStore";
+import { useNavigate } from "react-router-dom";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -30,14 +32,39 @@ export function TrackRow({
   onToggleFavorite: () => void;
   onOpenPlaylistMenu: () => void;
 }) {
+  const navigate = useNavigate();
+  const currentTrack = usePlayerStore((s) => s.currentTrack);
+  const isPlaying = usePlayerStore((s) => s.isPlaying);
   const isUuid = UUID_RE.test(track.id);
   const showHeart = canFavorite && isUuid;
+  const isThisPlaying =
+    Boolean(isPlaying && currentTrack?.id && currentTrack.id === track.id);
+
+  const openTrackPage = () => {
+    onPlay();
+    navigate(`/track/${track.id}`);
+  };
+
+  const playBtnClass =
+    "bg-gradient-to-b from-white to-[#ddd] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_1px_2px_rgba(0,0,0,0.2)]";
+
+  const playIconClass = "text-neutral-800";
 
   return (
     <div
       className={`flex items-center gap-2 border-b border-[#e0e0e0] bg-white px-2 py-2 last:border-b-0 dark:border-neutral-700 dark:bg-neutral-900 ${
         variant === "chart" ? "min-h-[52px]" : ""
       }`}
+      data-track-row
+      role="link"
+      tabIndex={0}
+      onClick={openTrackPage}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openTrackPage();
+        }
+      }}
     >
       {index != null ? (
         <span className="w-6 shrink-0 text-center text-[11px] font-bold text-neutral-500 inset-text">
@@ -47,11 +74,18 @@ export function TrackRow({
 
       <button
         type="button"
-        onClick={onPlay}
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-neutral-400 bg-gradient-to-b from-white to-[#ddd] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_1px_2px_rgba(0,0,0,0.2)]"
-        aria-label="Играть"
+        onClick={(e) => {
+          e.stopPropagation();
+          onPlay();
+        }}
+        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-neutral-400 ${playBtnClass}`}
+        aria-label={isThisPlaying ? "Пауза" : "Играть"}
       >
-        <Play className="h-4 w-4 pl-0.5 text-neutral-800" fill="currentColor" />
+        {isThisPlaying ? (
+          <Pause className={`h-4 w-4 ${playIconClass}`} fill="currentColor" />
+        ) : (
+          <Play className={`h-4 w-4 pl-0.5 ${playIconClass}`} fill="currentColor" />
+        )}
       </button>
 
       <div className="min-w-0 flex-1 text-left">
@@ -64,7 +98,7 @@ export function TrackRow({
       </div>
 
       {variant === "chart" ? (
-        <span className="shrink-0 rounded border border-neutral-300 bg-[#f6f6f6] px-1.5 py-0.5 text-[10px] font-bold text-neutral-700 shadow-inner">
+        <span className="shrink-0 rounded border border-neutral-400 bg-gradient-to-b from-[#e8e8e8] via-[#e0e0e0] to-[#d0d0d0] px-1.5 py-0.5 text-[10px] font-bold text-neutral-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]">
           {formatListens(track.playCount)} ▶
         </span>
       ) : null}

@@ -20,7 +20,8 @@ export const useSettingsStore = create<SettingsState>()(
       theme: "light",
       backgroundId: "white",
       language: "ru",
-      setTheme: (theme) => set({ theme }),
+      // Only light theme is allowed in the UI (no dark/light switching).
+      setTheme: () => set({ theme: "light" }),
       setBackgroundId: (backgroundId) => set({ backgroundId }),
       setLanguage: (language) => set({ language }),
     }),

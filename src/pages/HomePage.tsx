@@ -40,7 +40,14 @@ export function HomePage() {
   const [playlistPickTrack, setPlaylistPickTrack] =
     useState<PlayerTrack | null>(null);
   const refreshCatalog = useCallback(async () => {
-    setCatalog(await fetchAllTracksFromSupabase());
+    const tracks = await fetchAllTracksFromSupabase();
+    // Shuffle catalog order so it feels fresh on each visit.
+    const shuffled = [...tracks];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    setCatalog(shuffled);
   }, []);
 
   const refreshChart = useCallback(async () => {
@@ -153,8 +160,8 @@ export function HomePage() {
 
         {/* Чарт */}
         <section className="overflow-hidden rounded-xl border border-neutral-400/90 shadow-lg dark:border-neutral-600">
-          <div className="metallic-bg--compact px-3 py-2">
-            <h2 className="text-center text-[13px] font-bold inset-text--on-metal">
+          <div className="bg-gradient-to-b from-[#91aac7] via-[#6b8fb3] to-[#3e5c82] px-3 py-2">
+            <h2 className="text-center text-[13px] font-bold text-white drop-shadow-sm">
               {t("home.chartTitle")}
             </h2>
           </div>
@@ -188,17 +195,19 @@ export function HomePage() {
           tabIndex={0}
           onClick={(e) => {
             if ((e.target as HTMLElement).closest("button")) return;
+            if ((e.target as HTMLElement).closest("[data-track-row]")) return;
             void navigate("/collection");
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
               e.preventDefault();
               if ((e.target as HTMLElement).closest("button")) return;
+              if ((e.target as HTMLElement).closest("[data-track-row]")) return;
               void navigate("/collection");
             }
           }}
         >
-          <div className="flex items-center justify-between bg-gradient-to-b from-[#8fa8c4] to-[#3d5a80] px-3 py-2">
+          <div className="flex items-center justify-between bg-gradient-to-b from-[#91aac7] via-[#6b8fb3] to-[#3e5c82] px-3 py-2">
             <div className="flex items-center gap-2">
               <Heart
                 className="h-4 w-4 text-white drop-shadow"

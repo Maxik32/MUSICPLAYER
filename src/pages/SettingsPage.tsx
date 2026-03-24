@@ -3,16 +3,13 @@ import { useI18n } from "@/hooks/useI18n";
 import {
   type AppLanguage,
   type BackgroundId,
-  type ThemeMode,
   useSettingsStore,
 } from "@/store/useSettingsStore";
 
 export function SettingsPage() {
   const { t } = useI18n();
-  const theme = useSettingsStore((s) => s.theme);
   const backgroundId = useSettingsStore((s) => s.backgroundId);
   const language = useSettingsStore((s) => s.language);
-  const setTheme = useSettingsStore((s) => s.setTheme);
   const setBackgroundId = useSettingsStore((s) => s.setBackgroundId);
   const setLanguage = useSettingsStore((s) => s.setLanguage);
 
@@ -25,30 +22,13 @@ export function SettingsPage() {
             <p className="mb-2 text-[12px] font-bold text-neutral-700 dark:text-neutral-200">
               {t("settings.theme")}
             </p>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                className={`glossy-btn !text-[12px] transition-shadow dark:border-neutral-500 dark:text-neutral-100 ${
-                  theme === "light"
-                    ? "glossy-btn--primary ring-2 ring-[#2477d1] ring-offset-2 ring-offset-white dark:ring-offset-neutral-900"
-                    : ""
-                }`}
-                onClick={() => setTheme("light" as ThemeMode)}
-              >
-                {t("settings.themeStandard")}
-              </button>
-              <button
-                type="button"
-                className={`glossy-btn !text-[12px] transition-shadow dark:border-neutral-500 dark:text-neutral-100 ${
-                  theme === "dark"
-                    ? "glossy-btn--primary ring-2 ring-sky-400 ring-offset-2 ring-offset-white dark:ring-offset-neutral-900"
-                    : ""
-                }`}
-                onClick={() => setTheme("dark" as ThemeMode)}
-              >
-                {t("settings.themeDark")}
-              </button>
-            </div>
+            <button
+              type="button"
+              className="glossy-btn glossy-btn--primary !text-[12px] ring-2 ring-[#2477d1] ring-offset-2 ring-offset-white disabled:cursor-default disabled:opacity-100"
+              disabled
+            >
+              {t("settings.themeStandard")}
+            </button>
           </div>
 
           <div className="rounded-lg border border-neutral-200/90 bg-neutral-50/80 p-3 dark:border-neutral-600 dark:bg-neutral-800/50">

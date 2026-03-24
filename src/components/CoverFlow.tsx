@@ -3,9 +3,9 @@ import { useI18n } from "@/hooks/useI18n";
 import type { PlayerTrack } from "@/store/usePlayerStore";
 import { usePlayerStore } from "@/store/usePlayerStore";
 
-const SIDE = 3;
-const COVER_W = 112;
-const COVER_H = 112;
+const SIDE = 2; // only two cards on each side
+const COVER_W = 136;
+const COVER_H = 136;
 
 type SlotCfg = {
   x: number;
@@ -15,17 +15,18 @@ type SlotCfg = {
   zIndex: number;
 };
 
-/** Distance from center in queue steps: 3 = far, 1 = adjacent. Higher z = closer to viewer; center is always on top. */
-const Z_FOR_DIST: Record<1 | 2 | 3, number> = { 1: 52, 2: 36, 3: 22 };
+/** Distance from center in queue steps. Higher z = closer to viewer; center is always on top. */
+const Z_FOR_DIST: Record<1 | 2, number> = { 1: 56, 2: 34 };
 
 const LEFT_CFG: SlotCfg[] = [
-  { x: -278, rotateY: 60, translateZ: -118, scale: 0.46, zIndex: Z_FOR_DIST[3] },
-  { x: -172, rotateY: 52, translateZ: -68, scale: 0.6, zIndex: Z_FOR_DIST[2] },
-  { x: -90, rotateY: 44, translateZ: -32, scale: 0.76, zIndex: Z_FOR_DIST[1] },
+  // far (d=2)
+  { x: -230, rotateY: 52, translateZ: -70, scale: 0.6, zIndex: Z_FOR_DIST[2] },
+  // near (d=1)
+  { x: -110, rotateY: 44, translateZ: -34, scale: 0.78, zIndex: Z_FOR_DIST[1] },
 ];
 
 /** R0 sits next to center like L2; R2 is the far right like L0 — same depth → same z-index as the symmetric left slot. */
-const RIGHT_CFG: SlotCfg[] = [2, 1, 0].map((leftIdx) => {
+const RIGHT_CFG: SlotCfg[] = [1, 0].map((leftIdx) => {
   const c = LEFT_CFG[leftIdx]!;
   return {
     x: -c.x,
@@ -53,7 +54,7 @@ function CoverArt({
 }) {
   return (
     <div
-      className={`cover-reflect overflow-hidden rounded-md border-2 border-neutral-400 bg-gradient-to-br from-[#6eb6ff] via-[#2477d1] to-[#1159b3] shadow-[0_12px_28px_rgba(0,0,0,0.35)] ${
+      className={`cover-reflect overflow-hidden rounded-md border-2 border-neutral-400 bg-gradient-to-br from-[#e9e9e9] via-[#cfcfcf] to-[#9a9a9a] shadow-[0_12px_28px_rgba(0,0,0,0.35)] ${
         dimmed ? "opacity-45" : ""
       }`}
       style={{ width: COVER_W, height: COVER_H }}
@@ -81,6 +82,9 @@ function FlowSlot({
   onPick: () => void;
   isCenter?: boolean;
 }) {
+  // Don't render empty side slots (so left side can be empty when queueIndex===0).
+  if (!isCenter && !track) return null;
+
   return (
     <button
       type="button"
@@ -92,6 +96,7 @@ function FlowSlot({
         transform: `translateX(${cfg.x}px) translateZ(${cfg.translateZ}px) rotateY(${cfg.rotateY}deg) scale(${cfg.scale})`,
         zIndex: cfg.zIndex,
         willChange: "transform",
+        transition: "transform 320ms ease",
       }}
       onClick={onPick}
       disabled={!track}
@@ -108,6 +113,8 @@ export function CoverFlow({ previewTrack }: { previewTrack: PlayerTrack | null }
   const queueIndex = usePlayerStore((s) => s.queueIndex);
   const currentTrack = usePlayerStore((s) => s.currentTrack);
   const playTrack = usePlayerStore((s) => s.playTrack);
+  const nextTrack = usePlayerStore((s) => s.nextTrack);
+  const prevTrack = usePlayerStore((s) => s.prevTrack);
 
   const { leftTracks, centerTrack, rightTracks } = useMemo(() => {
     const left: (PlayerTrack | null)[] = [];
@@ -144,14 +151,39 @@ export function CoverFlow({ previewTrack }: { previewTrack: PlayerTrack | null }
   };
 
   return (
-    <section className="rounded-xl border border-neutral-400/90 bg-gradient-to-b from-[#f2f2f2] via-white to-[#e8e8e8] shadow-lg dark:border-neutral-600 dark:from-neutral-900 dark:via-neutral-950 dark:to-neutral-900">
-      <div className="metallic-bg--compact overflow-hidden rounded-t-xl px-3 py-2">
-        <h2 className="text-center text-[13px] font-bold inset-text--on-metal">
+    <section className="rounded-xl border border-neutral-400/90 shadow-lg dark:border-neutral-600">
+      <div className="overflow-hidden rounded-t-xl bg-gradient-to-b from-[#91aac7] via-[#6b8fb3] to-[#3e5c82] px-3 py-2">
+        <h2 className="text-center text-[13px] font-bold text-white drop-shadow-sm">
           {t("cover.title")}
         </h2>
       </div>
 
-      <div className="cover-flow-stage relative mx-auto h-[200px] w-full max-w-4xl overflow-hidden px-1 pb-2 pt-2 sm:h-[260px] sm:overflow-visible sm:px-2 sm:pt-4">
+      <div
+        className="cover-flow-stage relative mx-auto h-[240px] w-full max-w-4xl overflow-hidden px-1 pb-2 pt-2 sm:h-[280px] sm:overflow-visible sm:px-2 sm:pt-4"
+        style={{ touchAction: "pan-y" }}
+        onPointerDown={(e) => {
+          if (e.target !== e.currentTarget) return; // keep clicks on cards working
+          // lightweight swipe navigation
+          (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId);
+          (e.currentTarget as HTMLDivElement).dataset.swipeStartX = String(e.clientX);
+        }}
+        onPointerUp={(e) => {
+          const el = e.currentTarget as HTMLDivElement;
+          if (e.target !== e.currentTarget) return;
+          const startX = Number(el.dataset.swipeStartX ?? NaN);
+          const dx = e.clientX - startX;
+          // threshold: only meaningful swipe
+          if (Number.isFinite(startX)) {
+            if (dx < -60) void nextTrack();
+            if (dx > 60) void prevTrack();
+          }
+          el.dataset.swipeStartX = "";
+        }}
+        onPointerCancel={(e) => {
+          const el = e.currentTarget as HTMLDivElement;
+          el.dataset.swipeStartX = "";
+        }}
+      >
         <div
           className="cover-flow-pivot absolute left-1/2 top-[40%] w-0 -translate-x-1/2 -translate-y-1/2 max-[520px]:scale-[0.5] max-[520px]:origin-[50%_45%] sm:top-[42%] sm:scale-100"
           style={{ height: COVER_H, transformStyle: "preserve-3d" }}
@@ -181,7 +213,7 @@ export function CoverFlow({ previewTrack }: { previewTrack: PlayerTrack | null }
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-b-xl border-t border-neutral-300 bg-white/80 px-4 pb-3 pt-1 text-center dark:border-neutral-700 dark:bg-neutral-900/90">
+      <div className="overflow-hidden rounded-b-xl border-t border-[#91aac7]/30 bg-gradient-to-b from-[#e8eef5] to-[#d4dde8] px-4 pb-3 pt-1 text-center dark:border-neutral-700 dark:from-neutral-900 dark:to-neutral-950">
         {centerTrack ? (
           <>
             <p className="text-[15px] font-bold inset-text dark:text-neutral-100">

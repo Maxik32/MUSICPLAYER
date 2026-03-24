@@ -40,6 +40,8 @@ type PlayerState = {
   clearPlaybackError: () => void;
   shuffle: boolean;
   toggleShuffle: () => void;
+  repeat: boolean;
+  toggleRepeat: () => void;
   /** 0..1, mirrored on HTMLAudioElement.volume */
   volume: number;
   setVolume: (v: number) => void;
@@ -144,7 +146,16 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
     a.addEventListener("loadedmetadata", syncTime);
     a.addEventListener("durationchange", syncTime);
     a.addEventListener("ended", () => {
-      get().nextTrack();
+      const { repeat } = get();
+      if (repeat) {
+        const a2 = getAudio();
+        if (a2) {
+          a2.currentTime = 0;
+          void get().play();
+        }
+      } else {
+        get().nextTrack();
+      }
     });
     a.addEventListener("play", () => set({ isPlaying: true }));
     a.addEventListener("pause", () => set({ isPlaying: false }));
@@ -202,9 +213,11 @@ export const usePlayerStore = create<PlayerState>((set, get) => {
     durationSec: 0,
     playbackError: null,
     shuffle: false,
+    repeat: false,
     volume: 1,
 
     toggleShuffle: () => set((s) => ({ shuffle: !s.shuffle })),
+    toggleRepeat: () => set((s) => ({ repeat: !s.repeat })),
 
     setVolume: (v) => {
       const nv = Math.max(0, Math.min(1, v));

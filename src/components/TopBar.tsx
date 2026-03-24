@@ -66,20 +66,10 @@ export function TopBar() {
         <NavMenu />
 
         <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
-          <div className="flex shrink-0 items-center gap-2">
-            <img
-              src="/imusic-logo.svg"
-              alt=""
-              width={36}
-              height={36}
-              className="h-9 w-9 shrink-0 rounded-[20%] border border-[#5a5f66] shadow-[0_3px_8px_rgba(0,0,0,0.22)]"
-              draggable={false}
-            />
-            <div className="hidden min-w-0 sm:block">
-              <h1 className="text-sm font-bold leading-tight inset-text--on-metal">
-                {t("top.brand")}
-              </h1>
-            </div>
+          <div className="flex min-w-0 shrink-0 items-center">
+            <h1 className="text-sm font-bold leading-tight inset-text--on-metal">
+              {t("top.brand")}
+            </h1>
           </div>
 
           {showSearch ? (

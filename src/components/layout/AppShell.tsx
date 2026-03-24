@@ -17,7 +17,7 @@ export function AppShell() {
   const setAuthOpen = useUIStore((s) => s.setAuthOpen);
   const playerToast = useUIStore((s) => s.playerToast);
   const setPlayerToast = useUIStore((s) => s.setPlayerToast);
-  const theme = useSettingsStore((s) => s.theme);
+  // The app UI supports only light theme (no dark/light switching).
   const backgroundId = useSettingsStore((s) => s.backgroundId);
 
   useEffect(() => {
@@ -31,11 +31,11 @@ export function AppShell() {
     return () => window.clearTimeout(id);
   }, [playerToast, setPlayerToast]);
 
-  const shellBg = backgroundClass(backgroundId, theme);
+  const shellBg = backgroundClass(backgroundId, "light");
 
   return (
     <div
-      className={`min-h-dvh pb-[calc(10.5rem+env(safe-area-inset-bottom,0px))] font-ios max-sm:pb-[calc(11.25rem+env(safe-area-inset-bottom,0px))] ${theme === "dark" ? "dark" : ""} ${shellBg}`}
+      className={`min-h-dvh pb-[calc(10.5rem+env(safe-area-inset-bottom,0px))] font-ios max-sm:pb-[calc(11.25rem+env(safe-area-inset-bottom,0px))] ${shellBg}`}
     >
       <TopBar />
       <Outlet />

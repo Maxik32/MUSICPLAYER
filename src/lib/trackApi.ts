@@ -30,13 +30,22 @@ export async function fetchFavoriteTracks(
   if (!sb) return [];
   const { data: favs, error: e1 } = await sb
     .from("user_favorites")
-    .select("track_id")
+    .select("track_id,created_at")
     .eq("user_id", userId);
   if (e1) {
     console.warn("[favorites]", e1.message);
     return [];
   }
-  const ids = (favs ?? []).map((r) => (r as { track_id: string }).track_id);
+
+  const sortedFavs = (favs ?? []) as { track_id: string; created_at: string }[];
+  // Last added first (by created_at)
+  sortedFavs.sort((a, b) => {
+    const ta = new Date(a.created_at).getTime();
+    const tb = new Date(b.created_at).getTime();
+    return tb - ta;
+  });
+
+  const ids = sortedFavs.map((r) => r.track_id);
   if (!ids.length) return [];
   const { data: tracks, error: e2 } = await sb
     .from("tracks")
@@ -46,9 +55,14 @@ export async function fetchFavoriteTracks(
     console.warn("[favorites tracks]", e2.message);
     return [];
   }
-  return (tracks ?? [])
-    .map((row) => rowToTrack(row as Record<string, unknown>))
-    .filter((t): t is PlayerTrack => t != null);
+  const map = new Map<string, PlayerTrack>();
+  for (const row of tracks ?? []) {
+    const tr = rowToTrack(row as Record<string, unknown>);
+    if (tr) map.set(tr.id, tr);
+  }
+
+  // Preserve favorite order (by ids)
+  return ids.map((id) => map.get(id)).filter((t): t is PlayerTrack => Boolean(t));
 }
 
 export async function fetchFavoriteIds(userId: string): Promise<Set<string>> {
