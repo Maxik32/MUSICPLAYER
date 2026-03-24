@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { NavMenu } from "@/components/NavMenu";
 import { useI18n } from "@/hooks/useI18n";
+import { isSupabaseReachable } from "@/lib/supabaseClient";
 import { useAuthStore } from "@/store/useAuthStore";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { useUIStore } from "@/store/useUIStore";
@@ -27,6 +28,7 @@ export function TopBar() {
 
   const searchWrapRef = useRef<HTMLDivElement>(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [dbOnline, setDbOnline] = useState<boolean | null>(null);
 
   const searchResults = useMemo(() => {
     const q = homeSearch.trim().toLowerCase();
@@ -62,6 +64,22 @@ export function TopBar() {
     return () => document.removeEventListener("pointerdown", onPointerDown);
   }, [searchOpen]);
 
+  useEffect(() => {
+    let cancelled = false;
+    const check = async (force = false) => {
+      const ok = await isSupabaseReachable(force);
+      if (!cancelled) setDbOnline(ok);
+    };
+    void check(true);
+    const id = window.setInterval(() => {
+      void check(false);
+    }, 30_000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(id);
+    };
+  }, []);
+
   return (
     <header className="metallic-bg sticky top-0 z-[55] border-b border-neutral-600 shadow-md dark:border-neutral-700">
       <div className="mx-auto flex max-w-4xl items-center gap-2 px-2 py-2 sm:gap-3 sm:px-3">
@@ -72,6 +90,29 @@ export function TopBar() {
             <h1 className="text-sm font-bold leading-tight inset-text--on-metal">
               {t("top.brand")}
             </h1>
+            <span
+              className={`ml-1.5 inline-block h-2 w-2 rounded-full border border-white/60 ${
+                dbOnline == null
+                  ? "bg-neutral-400"
+                  : dbOnline
+                    ? "bg-emerald-500"
+                    : "bg-red-500"
+              }`}
+              title={
+                dbOnline == null
+                  ? "Supabase: ..."
+                  : dbOnline
+                    ? t("top.dbOnline")
+                    : t("top.dbOffline")
+              }
+              aria-label={
+                dbOnline == null
+                  ? "Supabase: ..."
+                  : dbOnline
+                    ? t("top.dbOnline")
+                    : t("top.dbOffline")
+              }
+            />
           </div>
 
           {showSearch ? (

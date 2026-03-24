@@ -22,22 +22,32 @@ export async function fetchChartTracks(limit = 30): Promise<PlayerTrack[]> {
   if (chartInFlight) return chartInFlight;
 
   const sb = getSupabase();
-  if (!sb) return [];
+  if (!sb) return chartCache?.value ?? [];
 
   chartInFlight = (async () => {
-    const { data, error } = await sb
-      .from("tracks")
-      .select(TRACKS_SELECT)
-      .order("play_count", { ascending: false })
-      .limit(limit);
+    const loadOnce = async () =>
+      sb
+        .from("tracks")
+        .select(TRACKS_SELECT)
+        .order("play_count", { ascending: false })
+        .limit(limit);
+
+    let res = await loadOnce();
+    if (res.error) {
+      await new Promise((r) => window.setTimeout(r, 350));
+      res = await loadOnce();
+    }
+    const { data, error } = res;
     if (error) {
       console.warn("[chart]", error.message);
-      return [];
+      return chartCache?.value ?? [];
     }
     const parsed = (data ?? [])
       .map((row) => rowToTrack(row as Record<string, unknown>))
       .filter((t): t is PlayerTrack => t != null);
-    chartCache = { value: parsed, at: Date.now(), limit };
+    if (parsed.length > 0 || !chartCache) {
+      chartCache = { value: parsed, at: Date.now(), limit };
+    }
     return parsed;
   })();
 

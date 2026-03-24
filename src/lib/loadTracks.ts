@@ -54,23 +54,34 @@ export async function fetchAllTracksFromSupabase(): Promise<PlayerTrack[]> {
   if (tracksInFlight) return tracksInFlight;
 
   const sb = getSupabase();
-  if (!sb) return [];
+  if (!sb) return tracksCache?.value ?? [];
 
   tracksInFlight = (async () => {
-    const { data, error } = await sb
-      .from("tracks")
-      .select(TRACKS_SELECT)
-      .order("created_at", { ascending: false });
+    const loadOnce = async () =>
+      sb
+        .from("tracks")
+        .select(TRACKS_SELECT)
+        .order("created_at", { ascending: false });
+
+    let res = await loadOnce();
+    // Small retry for transient CDN/network hiccups.
+    if (res.error) {
+      await new Promise((r) => window.setTimeout(r, 350));
+      res = await loadOnce();
+    }
+    const { data, error } = res;
 
     if (error) {
       console.warn("[tracks] Supabase:", error.message);
-      return [];
+      return tracksCache?.value ?? [];
     }
 
     const parsed = (data ?? [])
       .map((row) => normalizeTrackRow(row as Record<string, unknown>))
       .filter((t): t is PlayerTrack => t != null);
-    tracksCache = { value: parsed, at: Date.now() };
+    if (parsed.length > 0 || !tracksCache) {
+      tracksCache = { value: parsed, at: Date.now() };
+    }
     return parsed;
   })();
 
