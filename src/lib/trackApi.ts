@@ -6,21 +6,46 @@ function rowToTrack(row: Record<string, unknown>): PlayerTrack | null {
   return normalizeTrackRow(row);
 }
 
+const CHART_CACHE_TTL_MS = 20_000;
+let chartCache: { value: PlayerTrack[]; at: number; limit: number } | null = null;
+let chartInFlight: Promise<PlayerTrack[]> | null = null;
+
 export async function fetchChartTracks(limit = 30): Promise<PlayerTrack[]> {
+  const now = Date.now();
+  if (
+    chartCache &&
+    chartCache.limit === limit &&
+    now - chartCache.at < CHART_CACHE_TTL_MS
+  ) {
+    return chartCache.value;
+  }
+  if (chartInFlight) return chartInFlight;
+
   const sb = getSupabase();
   if (!sb) return [];
-  const { data, error } = await sb
-    .from("tracks")
-    .select(TRACKS_SELECT)
-    .order("play_count", { ascending: false })
-    .limit(limit);
-  if (error) {
-    console.warn("[chart]", error.message);
-    return [];
+
+  chartInFlight = (async () => {
+    const { data, error } = await sb
+      .from("tracks")
+      .select(TRACKS_SELECT)
+      .order("play_count", { ascending: false })
+      .limit(limit);
+    if (error) {
+      console.warn("[chart]", error.message);
+      return [];
+    }
+    const parsed = (data ?? [])
+      .map((row) => rowToTrack(row as Record<string, unknown>))
+      .filter((t): t is PlayerTrack => t != null);
+    chartCache = { value: parsed, at: Date.now(), limit };
+    return parsed;
+  })();
+
+  try {
+    return await chartInFlight;
+  } finally {
+    chartInFlight = null;
   }
-  return (data ?? [])
-    .map((row) => rowToTrack(row as Record<string, unknown>))
-    .filter((t): t is PlayerTrack => t != null);
 }
 
 export async function fetchFavoriteTracks(

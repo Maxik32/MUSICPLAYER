@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight, Heart } from "lucide-react";
 import { CoverFlow } from "@/components/CoverFlow";
@@ -36,6 +36,7 @@ export function HomePage() {
   const [favorites, setFavorites] = useState<PlayerTrack[]>([]);
   const [favIds, setFavIds] = useState<Set<string>>(new Set());
   const [playlists, setPlaylists] = useState<PlaylistRow[]>([]);
+  const noticeTimerRef = useRef<number | null>(null);
 
   const [playlistPickTrack, setPlaylistPickTrack] =
     useState<PlayerTrack | null>(null);
@@ -89,8 +90,19 @@ export function HomePage() {
 
   const showNotice = (msg: string) => {
     setNotice(msg);
-    window.setTimeout(() => setNotice(null), 3200);
+    if (noticeTimerRef.current) {
+      window.clearTimeout(noticeTimerRef.current);
+    }
+    noticeTimerRef.current = window.setTimeout(() => setNotice(null), 3200);
   };
+
+  useEffect(() => {
+    return () => {
+      if (noticeTimerRef.current) {
+        window.clearTimeout(noticeTimerRef.current);
+      }
+    };
+  }, []);
 
   const handleToggleFavorite = async (track: PlayerTrack) => {
     if (!user) {
