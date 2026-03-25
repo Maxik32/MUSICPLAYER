@@ -21,10 +21,13 @@ export function TopBar() {
   const playTrack = usePlayerStore((s) => s.playTrack);
 
   const user = useAuthStore((s) => s.user);
-  const nickname = useAuthStore((s) => s.nickname);
   const ready = useAuthStore((s) => s.ready);
   const signOut = useAuthStore((s) => s.signOut);
-  const displayName = nickname || user?.email || "";
+  const displayName =
+    (user?.user_metadata?.display_name as string | undefined)?.trim() ||
+    (user?.user_metadata?.nickname as string | undefined)?.trim() ||
+    user?.email ||
+    "";
 
   const searchWrapRef = useRef<HTMLDivElement>(null);
   const [searchOpen, setSearchOpen] = useState(false);

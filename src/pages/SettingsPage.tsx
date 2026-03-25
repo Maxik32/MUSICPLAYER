@@ -1,5 +1,4 @@
 import { NavLink } from "react-router-dom";
-import { useEffect, useState } from "react";
 import { useI18n } from "@/hooks/useI18n";
 import {
   type AppLanguage,
@@ -15,46 +14,7 @@ export function SettingsPage() {
   const setBackgroundId = useSettingsStore((s) => s.setBackgroundId);
   const setLanguage = useSettingsStore((s) => s.setLanguage);
   const user = useAuthStore((s) => s.user);
-  const authNickname = useAuthStore((s) => s.nickname);
-  const updateNickname = useAuthStore((s) => s.updateNickname);
-  const updatePassword = useAuthStore((s) => s.updatePassword);
-
-  const currentNickname = authNickname ?? "";
-
-  const [nickname, setNickname] = useState(currentNickname);
-  const [newPassword, setNewPassword] = useState("");
-  const [profileMessage, setProfileMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    setNickname(currentNickname);
-  }, [currentNickname]);
-
-  const saveNickname = async () => {
-    setProfileMessage(null);
-    try {
-      await updateNickname(nickname);
-      setProfileMessage(t("settings.nicknameSaved"));
-    } catch (e: unknown) {
-      const err = e as { message?: string };
-      setProfileMessage(err.message ?? t("settings.saveFailed"));
-    }
-  };
-
-  const savePassword = async () => {
-    setProfileMessage(null);
-    if (newPassword.trim().length < 6) {
-      setProfileMessage(t("settings.passwordMin"));
-      return;
-    }
-    try {
-      await updatePassword(newPassword);
-      setNewPassword("");
-      setProfileMessage(t("settings.passwordSaved"));
-    } catch (e: unknown) {
-      const err = e as { message?: string };
-      setProfileMessage(err.message ?? t("settings.saveFailed"));
-    }
-  };
+  // Nickname is chosen only during registration. No profile edits here to keep auth stable.
 
   return (
     <main className="mx-auto max-w-4xl px-3 py-6">
@@ -129,57 +89,8 @@ export function SettingsPage() {
           </div>
 
           {user ? (
-            <div className="space-y-4">
-              <div className="rounded-lg border border-neutral-200/90 bg-neutral-50/80 p-3 dark:border-neutral-600 dark:bg-neutral-800/50">
-                <p className="mb-2 text-[12px] font-bold text-neutral-700 dark:text-neutral-200">
-                  {t("settings.nickname")}
-                </p>
-                <div className="flex flex-col gap-2 sm:flex-row">
-                  <input
-                    type="text"
-                    value={nickname}
-                    onChange={(e) => setNickname(e.target.value)}
-                    className="inset-field"
-                    placeholder={t("settings.nicknamePlaceholder")}
-                  />
-                  <button
-                    type="button"
-                    className="glossy-btn glossy-btn--primary !text-[12px]"
-                    onClick={() => void saveNickname()}
-                  >
-                    {t("settings.save")}
-                  </button>
-                </div>
-              </div>
-
-              <div className="rounded-lg border border-neutral-200/90 bg-neutral-50/80 p-3 dark:border-neutral-600 dark:bg-neutral-800/50">
-                <p className="mb-2 text-[12px] font-bold text-neutral-700 dark:text-neutral-200">
-                  {t("settings.password")}
-                </p>
-                <div className="flex flex-col gap-2 sm:flex-row">
-                  <input
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="inset-field"
-                    placeholder={t("settings.passwordPlaceholder")}
-                    autoComplete="new-password"
-                  />
-                  <button
-                    type="button"
-                    className="glossy-btn glossy-btn--primary !text-[12px]"
-                    onClick={() => void savePassword()}
-                  >
-                    {t("settings.save")}
-                  </button>
-                </div>
-              </div>
-
-              {profileMessage ? (
-                <p className="rounded border border-neutral-300 bg-neutral-100 px-2 py-1.5 text-[11px] font-semibold text-neutral-700 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200">
-                  {profileMessage}
-                </p>
-              ) : null}
+            <div className="space-y-2 text-center text-[12px] font-semibold text-neutral-600 dark:text-neutral-400">
+              {t("settings.nickLocked")}
             </div>
           ) : null}
 

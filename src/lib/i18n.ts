@@ -81,6 +81,7 @@ export const STRINGS: Record<
     "settings.passwordSaved": "Пароль обновлён",
     "settings.passwordMin": "Минимум 6 символов",
     "settings.saveFailed": "Не удалось сохранить изменения",
+    "settings.nickLocked": "Ник задается при регистрации и не изменяется.",
     "settings.back": "← На главную",
     "about.title": "О нас",
     "about.p1":
@@ -183,6 +184,7 @@ export const STRINGS: Record<
     "settings.passwordSaved": "Password updated",
     "settings.passwordMin": "At least 6 characters",
     "settings.saveFailed": "Could not save changes",
+    "settings.nickLocked": "Nickname is set during registration and cannot be changed.",
     "settings.back": "← Home",
     "about.title": "About",
     "about.p1":
