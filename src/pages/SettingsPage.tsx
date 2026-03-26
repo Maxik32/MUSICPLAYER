@@ -5,7 +5,6 @@ import {
   type BackgroundId,
   useSettingsStore,
 } from "@/store/useSettingsStore";
-import { useAuthStore } from "@/store/useAuthStore";
 
 export function SettingsPage() {
   const { t } = useI18n();
@@ -13,8 +12,6 @@ export function SettingsPage() {
   const language = useSettingsStore((s) => s.language);
   const setBackgroundId = useSettingsStore((s) => s.setBackgroundId);
   const setLanguage = useSettingsStore((s) => s.setLanguage);
-  const user = useAuthStore((s) => s.user);
-  // Nickname is chosen only during registration. No profile edits here to keep auth stable.
 
   return (
     <main className="mx-auto max-w-4xl px-3 py-6">
@@ -61,9 +58,6 @@ export function SettingsPage() {
                 </button>
               ))}
             </div>
-            <p className="mt-2 text-[10px] font-semibold text-neutral-500 dark:text-neutral-400">
-              {t("settings.bgNote")}
-            </p>
           </div>
 
           <div>
@@ -87,12 +81,6 @@ export function SettingsPage() {
               </button>
             </div>
           </div>
-
-          {user ? (
-            <div className="space-y-2 text-center text-[12px] font-semibold text-neutral-600 dark:text-neutral-400">
-              {t("settings.nickLocked")}
-            </div>
-          ) : null}
 
           <NavLink to="/" className="glossy-btn inline-block !no-underline">
             {t("settings.back")}

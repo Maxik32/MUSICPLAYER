@@ -92,6 +92,8 @@ export const STRINGS: Record<
     "home.chartTitle": "Топ-30 · по прослушиваниям",
     "home.chartEmpty":
       "В Supabase пока нет треков или не настроен play_count (миграция SQL).",
+    "home.chartMore": "Показать все 30",
+    "home.chartLess": "Показать только 10",
     "home.favTitle": "Избранное",
     "home.favGo": "Моя коллекция",
     "home.favGuest":
@@ -195,6 +197,8 @@ export const STRINGS: Record<
     "home.chartTitle": "Top 30 · by plays",
     "home.chartEmpty":
       "No tracks in Supabase yet or play_count migration not applied.",
+    "home.chartMore": "Show all 30",
+    "home.chartLess": "Show only 10",
     "home.favTitle": "Favorites",
     "home.favGo": "My collection",
     "home.favGuest":

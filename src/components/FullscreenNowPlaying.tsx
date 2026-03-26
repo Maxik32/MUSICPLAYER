@@ -23,11 +23,7 @@ export function FullscreenNowPlaying() {
 
   return (
     <div
-      className="fixed inset-x-0 top-0 z-[200] flex flex-col bg-white dark:bg-neutral-950"
-      style={{
-        // Keep the fixed BottomPlayer visible (it lives at bottom with z-50).
-        bottom: "calc(10.5rem + env(safe-area-inset-bottom, 0px))",
-      }}
+      className="fixed inset-x-0 top-0 z-[200] bottom-[calc(8.5rem+env(safe-area-inset-bottom,0px))] max-sm:bottom-[calc(9rem+env(safe-area-inset-bottom,0px))] flex flex-col bg-white dark:bg-neutral-950"
       role="dialog"
       aria-modal="true"
       aria-label={t("now.title")}

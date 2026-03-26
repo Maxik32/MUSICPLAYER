@@ -32,6 +32,7 @@ export function HomePage() {
 
   const [notice, setNotice] = useState<string | null>(null);
   const [chart, setChart] = useState<PlayerTrack[]>([]);
+  const [showAllChart, setShowAllChart] = useState(false);
   const [catalog, setCatalog] = useState<PlayerTrack[]>([]);
   const [favorites, setFavorites] = useState<PlayerTrack[]>([]);
   const [favIds, setFavIds] = useState<Set<string>>(new Set());
@@ -87,6 +88,7 @@ export function HomePage() {
 
   const previewForFlow = chart[0] ?? catalog[0] ?? null;
   const favPreview = favorites.slice(0, 5);
+  const visibleChart = showAllChart ? chart : chart.slice(0, 10);
 
   const showNotice = (msg: string) => {
     setNotice(msg);
@@ -183,7 +185,7 @@ export function HomePage() {
                 {t("home.chartEmpty")}
               </p>
             ) : (
-              chart.map((t, i) => (
+              visibleChart.map((t, i) => (
                 <TrackRow
                   key={t.id}
                   track={t}
@@ -197,6 +199,17 @@ export function HomePage() {
                 />
               ))
             )}
+            {chart.length > 10 ? (
+              <div className="border-t border-neutral-200 p-2 text-center dark:border-neutral-700">
+                <button
+                  type="button"
+                  className="glossy-btn !text-[11px]"
+                  onClick={() => setShowAllChart((v) => !v)}
+                >
+                  {showAllChart ? t("home.chartLess") : t("home.chartMore")}
+                </button>
+              </div>
+            ) : null}
           </div>
         </section>
 
